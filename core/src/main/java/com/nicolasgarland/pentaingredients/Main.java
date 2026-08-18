@@ -3,6 +3,7 @@ package com.nicolasgarland.pentaingredients;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -28,7 +29,29 @@ public class Main extends Game {
      	font.setUseIntegerPositions(false);
      	font.getData().setScale(viewport.getWorldHeight() / Gdx.graphics.getHeight());
      		
-        this.setScreen(new MainMenuScreen(this)); // Affiche le menu au démarrage
+        changerEcran(new MainMenuScreen(this)); // Affiche le menu au démarrage
+    }
+
+    /**
+     * Remplace l'écran courant et libère le précédent.
+     *
+     * <p>{@link Game#setScreen} se contente d'appeler {@code hide()} : sans
+     * cela, chaque changement d'écran abandonnerait ses textures. La libération
+     * est différée d'une trame car la bascule est presque toujours déclenchée
+     * depuis un clic, donc pendant que le stage sortant traite encore
+     * l'événement.</p>
+     */
+    public void changerEcran(Screen nouvelEcran) {
+        final Screen precedent = getScreen();
+        setScreen(nouvelEcran);
+        if (precedent != null) {
+            Gdx.app.postRunnable(new Runnable() {
+                @Override
+                public void run() {
+                    precedent.dispose();
+                }
+            });
+        }
     }
 
     @Override
@@ -38,6 +61,8 @@ public class Main extends Game {
 
     @Override
     public void dispose() {
+        // Game.dispose() n'appelle que hide() sur l'écran courant.
+        if (getScreen() != null) getScreen().dispose();
         batch.dispose();
         font.dispose();
         ingredientIcons.dispose();

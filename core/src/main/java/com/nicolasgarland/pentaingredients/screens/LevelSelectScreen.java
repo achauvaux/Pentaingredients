@@ -66,7 +66,7 @@ public class LevelSelectScreen implements Screen {
         backButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(new MainMenuScreen(game));
+                game.changerEcran(new MainMenuScreen(game));
             }
         });
         stage.addActor(backButton);
@@ -96,7 +96,7 @@ public class LevelSelectScreen implements Screen {
             levelButton.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    game.setScreen(new GameScreen(game, num)); // Lancer le niveau
+                    game.changerEcran(new GameScreen(game, num)); // Lancer le niveau
                 }
             });
             

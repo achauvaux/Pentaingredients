@@ -59,14 +59,14 @@ public class MainMenuScreen implements Screen {
         playButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(new LevelSelectScreen(game));
+                game.changerEcran(new LevelSelectScreen(game));
             }
         });
 
         optionsButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(new OptionsScreen(game));
+                game.changerEcran(new OptionsScreen(game));
             }
         });
 
@@ -113,7 +113,8 @@ public class MainMenuScreen implements Screen {
 
     @Override
     public void hide() {
-        dispose();
+        // La libération revient à Main.changerEcran() : hide() est appelé à
+        // chaque bascule, y compris quand l'écran doit survivre.
     }
 
     @Override

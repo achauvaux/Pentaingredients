@@ -1,5 +1,6 @@
 package com.nicolasgarland.pentaingredients.screens;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.badlogic.gdx.Gdx;
@@ -61,7 +62,10 @@ public class GameScreen implements Screen {
 	private TextureRegion zeroLine;
 	private TextureRegion okLine;
 	private TextureRegion doubleLine;
-	
+
+	/** Toutes les textures chargées par cet écran, pour pouvoir les libérer. */
+	private final List<Texture> texturesChargees = new ArrayList<Texture>();
+
 
 	public GameScreen(Main game, int levelNb) {
         this.game = game;
@@ -83,17 +87,17 @@ public class GameScreen implements Screen {
         }
         this.selectedSlot = null;
         this.elements = new TextureRegion[]{
-        		new TextureRegion(new Texture(Gdx.files.internal("assets/skin/fire.png"))),
-        		new TextureRegion(new Texture(Gdx.files.internal("assets/skin/earth.png"))),
-        		new TextureRegion(new Texture(Gdx.files.internal("assets/skin/lightning.png"))),
-        		new TextureRegion(new Texture(Gdx.files.internal("assets/skin/water.png"))),
-        		new TextureRegion(new Texture(Gdx.files.internal("assets/skin/wind.png"))),
-        		new TextureRegion(new Texture(Gdx.files.internal("assets/skin/spirit.png")))
+        		new TextureRegion(texture("assets/skin/fire.png")),
+        		new TextureRegion(texture("assets/skin/earth.png")),
+        		new TextureRegion(texture("assets/skin/lightning.png")),
+        		new TextureRegion(texture("assets/skin/water.png")),
+        		new TextureRegion(texture("assets/skin/wind.png")),
+        		new TextureRegion(texture("assets/skin/spirit.png"))
         };
-        this.emptySlot = new TextureRegion(new Texture(Gdx.files.internal("assets/skin/slot.png")));
-        this.zeroLine = new TextureRegion(new Texture(Gdx.files.internal("assets/skin/line-noir.png")));
-        this.okLine = new TextureRegion(new Texture(Gdx.files.internal("assets/skin/line.png")));
-        this.doubleLine = new TextureRegion(new Texture(Gdx.files.internal("assets/skin/line-rouge.png")));
+        this.emptySlot = new TextureRegion(texture("assets/skin/slot.png"));
+        this.zeroLine = new TextureRegion(texture("assets/skin/line-noir.png"));
+        this.okLine = new TextureRegion(texture("assets/skin/line.png"));
+        this.doubleLine = new TextureRegion(texture("assets/skin/line-rouge.png"));
         this.imgLignes = new Image[] {new Image(okLine), new Image(okLine), new Image(okLine), new Image(okLine), new Image(okLine)};
         this.arbitre = new Arbitre(thisLevel, listOfIngredients, thisPositions);
         this.synergies = new int[] {1,1,1,1,1};
@@ -128,10 +132,22 @@ public class GameScreen implements Screen {
         	};
 	}
 
+	/**
+	 * Charge une texture et la retient pour {@link #dispose()}. Toute texture de
+	 * cet écran doit passer par ici : sinon elle fuit à chaque entrée dans un
+	 * niveau, et l'écran est reconstruit à chaque niveau, chaque réinitialisation
+	 * et chaque retour depuis la sélection.
+	 */
+	private Texture texture(String chemin) {
+		Texture texture = new Texture(Gdx.files.internal(chemin));
+		texturesChargees.add(texture);
+		return texture;
+	}
+
 	@Override
 	public void show() {
 	    // Charger le fond d'écran
-        background = new Texture(Gdx.files.internal("assets/menu_background.png"));
+        background = texture("assets/menu_background.png");
 
         // Créer Viewport
         FitViewport viewport = new FitViewport(1920, 1080);
@@ -181,7 +197,7 @@ public class GameScreen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
             	thisPositions.savePosition(levelNb);
-                game.setScreen(new LevelSelectScreen(game));
+                game.changerEcran(new LevelSelectScreen(game));
             }
         });
         mainTable.add(backButton).width(160).height(60).pad(10).align(Align.bottom);
@@ -250,7 +266,7 @@ public class GameScreen implements Screen {
             public void clicked(InputEvent event, float x, float y) {
             	thisPositions = new Positions();
             	thisPositions.savePosition(levelNb);
-            	game.setScreen(new GameScreen(game, levelNb));
+            	game.changerEcran(new GameScreen(game, levelNb));
             }
         });
         mainTable.add(resetButton).width(240).height(60).pad(10).align(Align.right);
@@ -354,9 +370,10 @@ public class GameScreen implements Screen {
         fillElemTable(elemTable, thisLevel.puissance, 64);
         levelTable.add(elemTable).colspan(3).center();
 		levelTable.row();
-		levelTable.add(new Image(new Texture(Gdx.files.internal("assets/skin/star.png")))).center();
-		levelTable.add(new Image(new Texture(Gdx.files.internal("assets/skin/star.png")))).center();
-		levelTable.add(new Image(new Texture(Gdx.files.internal("assets/skin/star.png")))).center();
+		Texture etoile = texture("assets/skin/star.png");
+		levelTable.add(new Image(etoile)).center();
+		levelTable.add(new Image(etoile)).center();
+		levelTable.add(new Image(etoile)).center();
 		levelTable.row();
 		levelTable.add(new Label(""+thisLevel.objectifs[0], skin, "default")).center();
 		levelTable.add(new Label(""+thisLevel.objectifs[1], skin, "default")).center();
@@ -370,7 +387,7 @@ public class GameScreen implements Screen {
 	    // Créer un groupe pour les acteurs du pentagramme
 	    Group pentagramGroup = new Group();
 	    // image pentagramme
-	    Image img = new Image(new Texture(Gdx.files.internal("assets/skin/Pentagramme.PNG")));
+	    Image img = new Image(texture("assets/skin/Pentagramme.PNG"));
 //	    Gdx.app.log("DEBUG", "pentagramme size : " + img.getWidth()+" x "+img.getHeight());
 //	    img.setSize(909, 908);
 	    img.setWidth(PENTAILLE);
@@ -432,7 +449,7 @@ public class GameScreen implements Screen {
 	    }
 	    
 	    // 10 slots
-	    TextureRegion slotTexture = new TextureRegion(new Texture(Gdx.files.internal("assets/skin/circle.png")));
+	    TextureRegion slotTexture = new TextureRegion(texture("assets/skin/circle.png"));
 	    float[][] slotPositionsPuissance = {
 	            {-0.915f,  0.29f},  // Position du slot 1 (x, y)
 	            { 0.915f,  0.29f},  // Position du slot 2
@@ -531,11 +548,11 @@ public class GameScreen implements Screen {
                 } else if (object.equals("next")) {
                 	String filePath = "assets/levels/level" + (levelNb+1) + ".json";
                     if (Gdx.files.internal(filePath).exists()) {
-                        game.setScreen(new GameScreen(game, levelNb+1));
+                        game.changerEcran(new GameScreen(game, levelNb+1));
                     } else {
                     	// renvoyer vers selection des niveaux
                     	Gdx.app.log("ERROR", "in loading level : " + Gdx.files.internal(filePath).file().getAbsolutePath());
-                    	game.setScreen(new LevelSelectScreen(game));
+                    	game.changerEcran(new LevelSelectScreen(game));
                     }
                 } 
             }
@@ -636,7 +653,10 @@ public class GameScreen implements Screen {
 	public void dispose() {
         metaStage.dispose();
         skin.dispose();
-        background.dispose();
+        for (Texture texture : texturesChargees) {
+            texture.dispose();
+        }
+        texturesChargees.clear();
 	}
 
 }
