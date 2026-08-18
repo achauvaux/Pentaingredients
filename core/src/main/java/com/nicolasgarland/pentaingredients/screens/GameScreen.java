@@ -3,12 +3,10 @@ package com.nicolasgarland.pentaingredients.screens;
 import java.util.List;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -16,23 +14,19 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.nicolasgarland.pentaingredients.Main;
 import com.nicolasgarland.pentaingredients.actors.InventorySlot;
 import com.nicolasgarland.pentaingredients.utils.Arbitre;
 import com.nicolasgarland.pentaingredients.utils.Ingredient;
-import com.nicolasgarland.pentaingredients.utils.IngredientsList;
 import com.nicolasgarland.pentaingredients.utils.Level;
 import com.nicolasgarland.pentaingredients.utils.Pentacle;
 import com.nicolasgarland.pentaingredients.utils.Positions;
@@ -329,11 +323,6 @@ public class GameScreen implements Screen {
 	    	infoCout.setText("Coût : "+item.cout);
 	    	elemTable.clear();
 	    	fillElemTable(elemTable, item.energies, 64);
-//	        for(int i=0 ; i<6 ; i++) {
-//	        	for(int j=0 ; j < item.energies[i] ; j++) {
-//	        		elemTable.add(new Image(elements[i])).size(64);
-//	        	}
-//	        }
 	    } else {
 	    	infoIcon.setDrawable(new TextureRegionDrawable(emptySlot));
 	    	infoName.setText("Aucun ingrédient sélectionné");
@@ -362,13 +351,6 @@ public class GameScreen implements Screen {
 		levelTable.row();
         Table elemTable = new Table();
         fillElemTable(elemTable, thisLevel.puissance, 64);
-//        for(int i=0 ; i<6 ; i++) {
-//        	for(int j=0 ; j < thisLevel.puissance[i] ; j++) {
-//        		Image img = new Image(elements[i]);
-//        		elemTable.add(img).size(64);
-////        	    Gdx.app.log("DEBUG", "element n°"+i+" size : " + img.getWidth()+" x "+img.getHeight());
-//        	}
-//        }
         levelTable.add(elemTable).colspan(3).center();
 		levelTable.row();
 		levelTable.add(new Image(new Texture(Gdx.files.internal("assets/skin/star.png")))).center();

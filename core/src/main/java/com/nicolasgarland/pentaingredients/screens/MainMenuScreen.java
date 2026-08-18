@@ -2,17 +2,13 @@ package com.nicolasgarland.pentaingredients.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.nicolasgarland.pentaingredients.Main;
 
@@ -39,7 +35,6 @@ public class MainMenuScreen implements Screen {
         // Charger la skin
 //        Gdx.app.log("DEBUG", "Chemin : " + Gdx.files.internal("assets/skin/uiskin.json").file().getAbsolutePath());
         skin = new Skin(Gdx.files.internal("assets/skin/uiskin.json"));
-//        skin = createFallbackSkin();
 
         // Créer les boutons
         TextButton playButton = new TextButton("Jouer", skin, "default");
@@ -89,34 +84,6 @@ public class MainMenuScreen implements Screen {
         stage.addActor(exitButton);
     }
 
-    private Skin createFallbackSkin() {
-        // Créer une skin de secours
-        Skin fallbackSkin = new Skin();
-
-        // Créer une texture de secours pour les boutons
-        Pixmap pixmap = new Pixmap(200, 50, Pixmap.Format.RGB888);
-        pixmap.setColor(Color.GRAY);
-        pixmap.fill();
-        fallbackSkin.add("button_up", new Texture(pixmap));
-
-        pixmap.setColor(Color.DARK_GRAY);
-        pixmap.fill();
-        fallbackSkin.add("button_down", new Texture(pixmap));
-
-        // Créer une police de secours
-        BitmapFont font = new BitmapFont();
-        fallbackSkin.add("default-font", font);
-
-        // Créer un style de bouton de secours
-        TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
-        textButtonStyle.up = fallbackSkin.newDrawable("button_up", Color.GRAY);
-        textButtonStyle.down = fallbackSkin.newDrawable("button_down", Color.DARK_GRAY);
-        textButtonStyle.font = font;
-        fallbackSkin.add("default", textButtonStyle);
-
-        return fallbackSkin;
-    }
-    
     @Override
     public void render(float delta) {
         // Effacer l'écran
