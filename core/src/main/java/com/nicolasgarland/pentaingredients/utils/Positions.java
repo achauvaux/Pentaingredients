@@ -11,6 +11,9 @@ public class Positions {
 		ETAGERE
 	}
 	
+	/** Dossier des sauvegardes, relatif au dossier de lancement du jeu. */
+	private static final String SAVE_DIR = "saves/";
+	
 	public int[] pentaPuissance;
 	public int[] pentaControle;
 	public int[][] etagere;
@@ -75,14 +78,14 @@ public class Positions {
 	}
 	
 	public void savePosition(int idLevel) {
-		String fileName = "posision" + idLevel + ".json";
+		String fileName = SAVE_DIR + "posision" + idLevel + ".json";
 		FileHandle file = Gdx.files.local(fileName);
        	file.writeString((new Json()).prettyPrint(this), false);
 	}
 	
 	public Positions loadPositions(int idLevel) {
     	Positions pos = this;
-        String fileName = "posision" + idLevel + ".json";
+        String fileName = SAVE_DIR + "posision" + idLevel + ".json";
         if (Gdx.files.local(fileName).exists()) {
             pos = (new Json()).fromJson(Positions.class, Gdx.files.local(fileName));
         } else {
