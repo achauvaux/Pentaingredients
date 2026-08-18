@@ -19,6 +19,9 @@ public class InventorySlot extends Actor {
     private int posInt;
     private final IngredientIcons icones;
 
+    /** Sur l'étagère, une case vide s'efface ; sur le pentagramme, elle appelle. */
+    private boolean discretSiVide;
+
     public InventorySlot(TextureRegion slotTexture, Emplacement empl, int num, IngredientIcons icones) {
         this.slotTexture = slotTexture;
         this.icones = icones;
@@ -31,23 +34,32 @@ public class InventorySlot extends Actor {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        // Dessiner le fond de la case
+        Color couleur = getColor();
+        float opacite = couleur.a * parentAlpha * (discretSiVide && item == null ? 0.35f : 1f);
+        batch.setColor(couleur.r, couleur.g, couleur.b, opacite);
         batch.draw(slotTexture, getX(), getY(), getWidth(), getHeight());
 
         // Dessiner une bordure si la case est sélectionnée
         if (isSelected()) {
             batch.setColor(Color.YELLOW);
             batch.draw(slotTexture, getX() - 2, getY() - 2, getWidth() + 4, getHeight() + 4);
-            batch.setColor(Color.WHITE);
         }
 
-        // Dessiner l'objet s'il y en a un
+        // L'icône garde ses propres couleurs, elle n'hérite pas de la teinte du cadre
         if (item != null) {
             Texture icone = icones.get(item.id);
             if (icone != null) {
+                batch.setColor(Color.WHITE);
                 batch.draw(icone, getX() + 5, getY() + 5, getWidth() - 10, getHeight() - 10);
             }
         }
+
+        batch.setColor(Color.WHITE);
+    }
+
+    /** Atténue le cadre tant qu'aucun ingrédient n'occupe la case. */
+    public void setDiscretSiVide(boolean discretSiVide) {
+        this.discretSiVide = discretSiVide;
     }
 
     // Méthodes pour gérer l'objet

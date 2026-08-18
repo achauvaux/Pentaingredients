@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -16,6 +17,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.nicolasgarland.pentaingredients.Main;
 import com.nicolasgarland.pentaingredients.actors.InventorySlot;
+import com.nicolasgarland.pentaingredients.graphics.Palette;
 import com.nicolasgarland.pentaingredients.graphics.RessourcesJeu;
 import com.nicolasgarland.pentaingredients.utils.Ingredient;
 import com.nicolasgarland.pentaingredients.utils.Partie;
@@ -75,6 +77,11 @@ public class GameScreen implements Screen, EcouteurDeSlot {
 					}
 				});
 
+		// Posé avant tout le reste : il occupe le fond de la scène.
+		Image ambiance = new Image(ressources.ambiance);
+		ambiance.setSize(metaStage.getWidth(), metaStage.getHeight());
+		metaStage.addActor(ambiance);
+
 		Table metaTable = new Table();
 		metaTable.setFillParent(true);
 		metaTable.add(panneauGauche());
@@ -90,6 +97,7 @@ public class GameScreen implements Screen, EcouteurDeSlot {
 		Table panneau = new Table();
 
 		TextButton regles = new TextButton("Règles", skin, "default");
+		regles.setColor(Palette.HABILLAGE);
 		regles.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
@@ -104,6 +112,7 @@ public class GameScreen implements Screen, EcouteurDeSlot {
 		panneau.row();
 
 		TextButton retour = new TextButton("Retour", skin);
+		retour.setColor(Palette.HABILLAGE);
 		retour.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {

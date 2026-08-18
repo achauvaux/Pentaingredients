@@ -13,7 +13,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.nicolasgarland.pentaingredients.actors.InventorySlot;
+import com.badlogic.gdx.graphics.Color;
 import com.nicolasgarland.pentaingredients.graphics.IngredientIcons;
+import com.nicolasgarland.pentaingredients.graphics.Palette;
 import com.nicolasgarland.pentaingredients.graphics.RessourcesJeu;
 import com.nicolasgarland.pentaingredients.utils.Arbitre;
 import com.nicolasgarland.pentaingredients.utils.Partie;
@@ -91,7 +93,7 @@ public class VuePentagramme {
 		this.surIncantation = surIncantation;
 
 		for (int ligne = 0; ligne < Arbitre.NB_LIGNES; ligne++) {
-			traits[ligne] = new Image(ressources.traitNeutre);
+			traits[ligne] = new Image(ressources.trait);
 			energiesParLigne[ligne][0] = new Table();
 			energiesParLigne[ligne][1] = new Table();
 		}
@@ -108,9 +110,11 @@ public class VuePentagramme {
 		principale.row();
 
 		coutTotal = new Label("Coût total : " + partie.coutTotal(), skin, "default");
+		coutTotal.setColor(Palette.PARCHEMIN);
 		principale.add(coutTotal).align(Align.left);
 
 		TextButton incantation = new TextButton("Lancer l'incantation", skin);
+		incantation.setColor(Palette.HABILLAGE);
 		incantation.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
@@ -126,7 +130,7 @@ public class VuePentagramme {
 	private Table commandeDuRituel() {
 		Table commande = new Table();
 
-		commande.add(new Label(partie.niveau.name, skin, "title")).colspan(3).center();
+		commande.add(new Label(partie.niveau.name, Palette.titre(skin))).colspan(3).center();
 		commande.row();
 
 		Table requises = new Table();
@@ -135,12 +139,17 @@ public class VuePentagramme {
 		commande.row();
 
 		for (int seuil = 0; seuil < 3; seuil++) {
-			commande.add(new Image(ressources.etoile)).center();
+			// Éteintes : ce sont des seuils à atteindre, pas des récompenses acquises.
+			Image etoile = new Image(ressources.etoile);
+			etoile.setColor(Palette.ETOILE_ETEINTE);
+			commande.add(etoile).center();
 		}
 		commande.row();
 
 		for (int seuil = 0; seuil < 3; seuil++) {
-			commande.add(new Label("" + partie.niveau.objectifs[seuil], skin, "default")).center();
+			Label seuilLabel = new Label("" + partie.niveau.objectifs[seuil], skin, "default");
+			seuilLabel.setColor(Palette.PARCHEMIN);
+			commande.add(seuilLabel).center();
 		}
 		commande.row();
 
@@ -150,14 +159,22 @@ public class VuePentagramme {
 	private Group pentagramme() {
 		Group groupe = new Group();
 
-		Image fond = new Image(ressources.pentagramme);
-		fond.setWidth(COTE);
-		fond.setHeight(COTE);
-		groupe.addActor(fond);
+		// La lueur d'abord : tout le reste se pose dessus.
+		Image lueur = new Image(ressources.lueur);
+		lueur.setColor(Palette.BRAISE.r, Palette.BRAISE.g, Palette.BRAISE.b, 0.22f);
+		lueur.setSize(COTE * 1.7f, COTE * 1.7f);
+		lueur.setPosition((COTE - lueur.getWidth()) / 2f, (COTE - lueur.getHeight()) / 2f);
+		groupe.addActor(lueur);
+
+		Image trace = new Image(ressources.pentagramme);
+		trace.setColor(Palette.OR);
+		trace.setWidth(COTE);
+		trace.setHeight(COTE);
+		groupe.addActor(trace);
 
 		for (int ligne = 0; ligne < Arbitre.NB_LIGNES; ligne++) {
 			Image trait = traits[ligne];
-			trait.setDrawable(new TextureRegionDrawable(traitSelonSynergie(partie.synergie(ligne + 1))));
+			trait.setColor(couleurSelonSynergie(partie.synergie(ligne + 1)));
 			trait.setWidth(COTE - 50);
 			trait.setHeight(128);
 			trait.setRotation(ANGLE_DES_TRAITS[ligne]);
@@ -182,15 +199,16 @@ public class VuePentagramme {
 			}
 		}
 
-		poserEmplacements(groupe, Emplacement.PUISSANCE, POSITION_DES_POINTES);
-		poserEmplacements(groupe, Emplacement.CONTROLE, POSITION_DES_MILIEUX);
+		poserEmplacements(groupe, Emplacement.PUISSANCE, POSITION_DES_POINTES, Palette.BRAISE);
+		poserEmplacements(groupe, Emplacement.CONTROLE, POSITION_DES_MILIEUX, Palette.GIVRE);
 
 		return groupe;
 	}
 
-	private void poserEmplacements(Group groupe, Emplacement role, float[][] positions) {
+	private void poserEmplacements(Group groupe, Emplacement role, float[][] positions, Color couleur) {
 		for (int numero = 0; numero < positions.length; numero++) {
 			final InventorySlot slot = new InventorySlot(ressources.emplacement, role, numero, icones);
+			slot.setColor(couleur);
 			slot.setItem(partie.ingredient(partie.idSur(numero, role)));
 			slot.setPosition(place(positions[numero][0], slot.getWidth()),
 					place(positions[numero][1], slot.getHeight()));
@@ -218,7 +236,7 @@ public class VuePentagramme {
 		coutTotal.setText("Coût total : " + partie.coutTotal());
 
 		for (int ligne = 0; ligne < Arbitre.NB_LIGNES; ligne++) {
-			traits[ligne].setDrawable(new TextureRegionDrawable(traitSelonSynergie(partie.synergie(ligne + 1))));
+			traits[ligne].setColor(couleurSelonSynergie(partie.synergie(ligne + 1)));
 
 			int[][] energies = partie.energiesDeLaLigne(ligne + 1);
 			for (int role = 0; role < 2; role++) {
@@ -228,14 +246,18 @@ public class VuePentagramme {
 		}
 	}
 
-	private TextureRegion traitSelonSynergie(int synergie) {
+	/**
+	 * La couleur du trait dit ce que vaut la ligne : cendre quand elle est
+	 * éteinte, braise quand elle compte double, parchemin le reste du temps.
+	 */
+	private Color couleurSelonSynergie(int synergie) {
 		switch (synergie) {
 			case Arbitre.SYNERGIE_NULLE:
-				return ressources.traitNul;
+				return Palette.CENDRE;
 			case Arbitre.SYNERGIE_DOUBLE:
-				return ressources.traitDouble;
+				return Palette.BRAISE;
 			default:
-				return ressources.traitNeutre;
+				return Palette.PARCHEMIN;
 		}
 	}
 }

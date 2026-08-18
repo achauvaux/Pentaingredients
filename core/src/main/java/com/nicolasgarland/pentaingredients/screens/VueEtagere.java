@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.nicolasgarland.pentaingredients.actors.InventorySlot;
 import com.nicolasgarland.pentaingredients.graphics.IngredientIcons;
+import com.nicolasgarland.pentaingredients.graphics.Palette;
 import com.nicolasgarland.pentaingredients.graphics.RessourcesJeu;
 import com.nicolasgarland.pentaingredients.utils.Ingredient;
 import com.nicolasgarland.pentaingredients.utils.Partie;
@@ -54,7 +55,7 @@ public class VueEtagere {
 	public Actor construire() {
 		Table principale = new Table();
 
-		principale.add(new Label("Etagères", skin, "title")).center();
+		principale.add(new Label("Etagères", Palette.titre(skin))).center();
 		principale.row();
 
 		principale.add(rangees()).center();
@@ -64,6 +65,7 @@ public class VueEtagere {
 		principale.row();
 
 		TextButton reinitialisation = new TextButton("Réinitialisation", skin);
+		reinitialisation.setColor(Palette.HABILLAGE);
 		reinitialisation.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
@@ -83,6 +85,8 @@ public class VueEtagere {
 				int position = rangee * CASES_PAR_RANGEE + colonne;
 				final InventorySlot slot =
 						new InventorySlot(ressources.caseVide, Emplacement.ETAGERE, position, icones);
+				slot.setColor(Palette.CASE_PLEINE);
+				slot.setDiscretSiVide(true);
 				slot.setItem(partie.ingredient(partie.idSur(position, Emplacement.ETAGERE)));
 				slot.addListener(new ClickListener() {
 					@Override
@@ -100,11 +104,13 @@ public class VueEtagere {
 
 	private Window fiche() {
 		Window fenetre = new Window("Ingrédient sélectionné :", skin);
+		fenetre.setColor(Palette.PANNEAU);
 		Table contenu = new Table();
 
 		ficheIcone = new Image(ressources.caseVide);
 		contenu.add(ficheIcone).size(64).align(Align.left);
 		ficheNom = new Label("Aucun ingrédient sélectionné", skin, "default");
+		ficheNom.setColor(Palette.PARCHEMIN);
 		contenu.add(ficheNom).align(Align.left);
 		contenu.row();
 
@@ -114,8 +120,10 @@ public class VueEtagere {
 		contenu.row();
 
 		ficheCout = new Label("", skin, "default");
+		ficheCout.setColor(Palette.PARCHEMIN);
 		contenu.add(ficheCout).align(Align.left);
 		ficheFamille = new Label("", skin, "default");
+		ficheFamille.setColor(Palette.OR);
 		contenu.add(ficheFamille).align(Align.right);
 
 		fenetre.add(contenu).size(640, 250);
