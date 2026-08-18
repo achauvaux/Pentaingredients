@@ -22,15 +22,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.nicolasgarland.pentaingredients.Main;
 import com.nicolasgarland.pentaingredients.actors.InventorySlot;
-import com.nicolasgarland.pentaingredients.utils.Arbitre;
 import com.nicolasgarland.pentaingredients.utils.Ingredient;
-import com.nicolasgarland.pentaingredients.utils.Level;
+import com.nicolasgarland.pentaingredients.utils.Partie;
 import com.nicolasgarland.pentaingredients.utils.Pentacle;
-import com.nicolasgarland.pentaingredients.utils.Positions;
 import com.nicolasgarland.pentaingredients.utils.Positions.Emplacement;
 
 public class GameScreen implements Screen {
@@ -41,10 +38,7 @@ public class GameScreen implements Screen {
     private Skin skin;
     private Texture background;
     
-    private int levelNb;
-    private Level thisLevel;
-    private Positions thisPositions;
-    private List<Ingredient> listOfIngredients;
+    private final Partie partie;
     private InventorySlot selectedSlot;
     private TextureRegion[] elements;
 	private Image infoIcon;
@@ -54,7 +48,6 @@ public class GameScreen implements Screen {
 	private Table elemTable;
 	private TextureRegion emptySlot;
 	private Label coutTotalLabel;
-	private Arbitre arbitre;
 	private int[] synergies;
 	private int[][][] puisCtrlLignes;
 	private Table[][] puisCtrlTables;
@@ -69,22 +62,7 @@ public class GameScreen implements Screen {
 
 	public GameScreen(Main game, int levelNb) {
         this.game = game;
-        this.levelNb = levelNb;
-        String filePath = "assets/levels/level" + levelNb + ".json";
-        if (Gdx.files.internal(filePath).exists()) {
-            this.thisLevel = (new Json()).fromJson(Level.class, Gdx.files.internal(filePath));
-        } else {
-        	Gdx.app.log("ERROR", "in loading level : " + Gdx.files.internal(filePath).file().getAbsolutePath());
-        }
-        this.thisPositions = (new Positions().loadPositions(levelNb));
-
-        this.listOfIngredients = null;
-        filePath = "assets/ingredients.lst";
-        if (Gdx.files.internal(filePath).exists()) {
-        	this.listOfIngredients = (new Json()).fromJson(List.class, Ingredient.class, Gdx.files.internal(filePath));
-        } else {
-        	Gdx.app.log("ERROR", "in loading ingredients list : " + Gdx.files.internal(filePath).file().getAbsolutePath());
-        }
+        this.partie = Partie.charger(levelNb);
         this.selectedSlot = null;
         this.elements = new TextureRegion[]{
         		new TextureRegion(texture("assets/skin/fire.png")),
@@ -99,7 +77,6 @@ public class GameScreen implements Screen {
         this.okLine = new TextureRegion(texture("assets/skin/line.png"));
         this.doubleLine = new TextureRegion(texture("assets/skin/line-rouge.png"));
         this.imgLignes = new Image[] {new Image(okLine), new Image(okLine), new Image(okLine), new Image(okLine), new Image(okLine)};
-        this.arbitre = new Arbitre(thisLevel, listOfIngredients, thisPositions);
         this.synergies = new int[] {1,1,1,1,1};
         this.puisCtrlLignes = new int[][][] { // [ligne][2][énergies]
         	{
@@ -196,7 +173,7 @@ public class GameScreen implements Screen {
         backButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-            	thisPositions.savePosition(levelNb);
+            	partie.sauvegarder();
                 game.changerEcran(new LevelSelectScreen(game));
             }
         });
@@ -221,8 +198,7 @@ public class GameScreen implements Screen {
             for (int col = 0; col < 10; col++) {
             	final InventorySlot slot = new InventorySlot(emptySlot, Emplacement.ETAGERE, row*10+col, game.ingredientIcons);
                 
-            	int idIng = thisPositions.etagere[row][col];
-            	if(idIng != 0) slot.setItem(listOfIngredients.get(idIng-1));
+            	slot.setItem(partie.ingredient(partie.idSur(row*10+col, Emplacement.ETAGERE)));
                 // Ajouter un écouteur pour les clics
             	slot.addListener(new ClickListener() {
             		@Override
@@ -264,9 +240,8 @@ public class GameScreen implements Screen {
         resetButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-            	thisPositions = new Positions();
-            	thisPositions.savePosition(levelNb);
-            	game.changerEcran(new GameScreen(game, levelNb));
+            	partie.reinitialiser();
+            	game.changerEcran(new GameScreen(game, partie.numeroNiveau));
             }
         });
         mainTable.add(resetButton).width(240).height(60).pad(10).align(Align.right);
@@ -290,19 +265,16 @@ public class GameScreen implements Screen {
 				Ingredient ingr = slot.getItem();
 				slot.setItem(selectedSlot.getItem());
 				selectedSlot.setItem(ingr);
-				thisPositions.swapIngr(slot.getPosInt(), slot.getPosEmpl(), selectedSlot.getPosInt(), selectedSlot.getPosEmpl());
-//		       	Gdx.app.log("DEBUG", "in permut position : " + (new Json()).prettyPrint(thisPositions));
-				thisPositions.savePosition(levelNb);
-				arbitre.setPos(thisPositions);
+				partie.deplacer(slot.getPosInt(), slot.getPosEmpl(), selectedSlot.getPosInt(), selectedSlot.getPosEmpl());
 				
 				if(slot.getPosEmpl()==Emplacement.CONTROLE || slot.getPosEmpl()==Emplacement.PUISSANCE || 
 				   selectedSlot.getPosEmpl()==Emplacement.CONTROLE || selectedSlot.getPosEmpl()==Emplacement.PUISSANCE) {
 					// recalcule le coutTotal
-					coutTotalLabel.setText("Coût total : " + arbitre.coutTotal()) ;
+					coutTotalLabel.setText("Coût total : " + partie.coutTotal()) ;
 					
 					//recalcule les lignes et les énergies dessus/dessous
 					for(int i=0; i<5; i++) {
-						synergies[i] = arbitre.multLigneSynergie(i+1);
+						synergies[i] = partie.synergie(i+1);
 						switch(synergies[i]) {
 							case 0:
 								imgLignes[i].setDrawable(new TextureRegionDrawable(zeroLine));
@@ -314,7 +286,7 @@ public class GameScreen implements Screen {
 								imgLignes[i].setDrawable(new TextureRegionDrawable(doubleLine));
 								break;
 						}
-						puisCtrlLignes[i] = arbitre.lignePuisCtrl(i+1);
+						puisCtrlLignes[i] = partie.energiesDeLaLigne(i+1);
 						puisCtrlTables[i][0].clear();
 						fillElemTable(puisCtrlTables[i][0], puisCtrlLignes[i][0], 18);
 						puisCtrlTables[i][1].clear();
@@ -364,10 +336,10 @@ public class GameScreen implements Screen {
 		// description du niveau
 		Table levelTable = new Table();
 		
-		levelTable.add(new Label(thisLevel.name, skin, "title")).colspan(3).center();
+		levelTable.add(new Label(partie.niveau.name, skin, "title")).colspan(3).center();
 		levelTable.row();
         Table elemTable = new Table();
-        fillElemTable(elemTable, thisLevel.puissance, 64);
+        fillElemTable(elemTable, partie.niveau.puissance, 64);
         levelTable.add(elemTable).colspan(3).center();
 		levelTable.row();
 		Texture etoile = texture("assets/skin/star.png");
@@ -375,9 +347,9 @@ public class GameScreen implements Screen {
 		levelTable.add(new Image(etoile)).center();
 		levelTable.add(new Image(etoile)).center();
 		levelTable.row();
-		levelTable.add(new Label(""+thisLevel.objectifs[0], skin, "default")).center();
-		levelTable.add(new Label(""+thisLevel.objectifs[1], skin, "default")).center();
-		levelTable.add(new Label(""+thisLevel.objectifs[2], skin, "default")).center();
+		levelTable.add(new Label(""+partie.niveau.objectifs[0], skin, "default")).center();
+		levelTable.add(new Label(""+partie.niveau.objectifs[1], skin, "default")).center();
+		levelTable.add(new Label(""+partie.niveau.objectifs[2], skin, "default")).center();
 		levelTable.row();
 	    
 		mainTable.add(levelTable).colspan(2).center();
@@ -404,7 +376,7 @@ public class GameScreen implements Screen {
 	    		{1.60f, -0.43f},
 	    };
 	    for(int i=0; i<5; i++) {
-			synergies[i] = arbitre.multLigneSynergie(i+1);
+			synergies[i] = partie.synergie(i+1);
 			switch(synergies[i]) {
 				case 0:
 					imgLignes[i].setDrawable(new TextureRegionDrawable(zeroLine));
@@ -435,7 +407,7 @@ public class GameScreen implements Screen {
 	    		{{-0.2f, -0.3f},  {-0.14f, -0.2f}}
 	    };
 	    for(int i=0; i<5; i++) {
-			puisCtrlLignes[i] = arbitre.lignePuisCtrl(i+1);
+			puisCtrlLignes[i] = partie.energiesDeLaLigne(i+1);
 	    	for(int pc=0; pc<2; pc++) {
 				puisCtrlTables[i][pc].clear();
 				fillElemTable(puisCtrlTables[i][pc], puisCtrlLignes[i][pc], 18);
@@ -459,8 +431,7 @@ public class GameScreen implements Screen {
 	        };
 	    for(int i=0; i<5; i++) {
 	    	final InventorySlot slotP = new InventorySlot(slotTexture, Emplacement.PUISSANCE, i, game.ingredientIcons);
-	    	int idIng = thisPositions.pentaPuissance[i];
-	    	if(idIng != 0) slotP.setItem(listOfIngredients.get(idIng-1));
+	    	slotP.setItem(partie.ingredient(partie.idSur(i, Emplacement.PUISSANCE)));
 	    	slotP.setPosition(	PENTAILLE/2*(1+slotPositionsPuissance[i][0])-slotP.getWidth()/2, 
 	    						PENTAILLE/2*(1+slotPositionsPuissance[i][1])-slotP.getHeight()/2);
             // Ajouter un écouteur pour les clics
@@ -482,8 +453,7 @@ public class GameScreen implements Screen {
 	        };
 	    for(int i=0; i<5; i++) {
 	    	InventorySlot slotC = new InventorySlot(slotTexture, Emplacement.CONTROLE, i, game.ingredientIcons);
-	    	int idIng = thisPositions.pentaControle[i];
-	    	if(idIng != 0) slotC.setItem(listOfIngredients.get(idIng-1));
+	    	slotC.setItem(partie.ingredient(partie.idSur(i, Emplacement.CONTROLE)));
 	    	slotC.setPosition(	PENTAILLE/2*(1+slotPositionsControle[i][0])-slotC.getWidth()/2, 
 	    						PENTAILLE/2*(1+slotPositionsControle[i][1])-slotC.getHeight()/2);
             // Ajouter un écouteur pour les clics
@@ -499,14 +469,14 @@ public class GameScreen implements Screen {
 	    mainTable.add(pentagramGroup).pad(50).colspan(2).size(PENTAILLE, PENTAILLE);
 	    
 	    mainTable.row();
-	    coutTotalLabel = new Label("Coût total : " + arbitre.coutTotal(), skin, "default");
+	    coutTotalLabel = new Label("Coût total : " + partie.coutTotal(), skin, "default");
 	    mainTable.add(coutTotalLabel).align(Align.left);
 	    
 	    TextButton validButton = new TextButton("Lancer l'incantation", skin);
         validButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-            	thisPositions.savePosition(levelNb);
+            	partie.sauvegarder();
             	showResultatDialog();
             }
 
@@ -546,12 +516,11 @@ public class GameScreen implements Screen {
                 if (object.equals("return")) {
                 	
                 } else if (object.equals("next")) {
-                	String filePath = "assets/levels/level" + (levelNb+1) + ".json";
-                    if (Gdx.files.internal(filePath).exists()) {
-                        game.changerEcran(new GameScreen(game, levelNb+1));
+                	int suivant = partie.numeroNiveau + 1;
+                    if (Partie.niveauExiste(suivant)) {
+                        game.changerEcran(new GameScreen(game, suivant));
                     } else {
-                    	// renvoyer vers selection des niveaux
-                    	Gdx.app.log("ERROR", "in loading level : " + Gdx.files.internal(filePath).file().getAbsolutePath());
+                    	// plus de niveau : renvoyer vers la sélection
                     	game.changerEcran(new LevelSelectScreen(game));
                     }
                 } 
@@ -565,11 +534,11 @@ public class GameScreen implements Screen {
         mainTable.add(new Label(" Puissance requise : ", skin, "default")).align(Align.left);
 
         Table objTable = new Table();
-        fillElemTable(objTable, thisLevel.puissance, 64);
+        fillElemTable(objTable, partie.niveau.puissance, 64);
         mainTable.add(objTable).center();
         mainTable.row();
         
-        Pentacle valid = arbitre.validerPentacle();
+        Pentacle valid = partie.valider();
         
         mainTable.add(new Label(" Puissance du rituel : ", skin, "default")).align(Align.left);
 //        rulesDialog.text("\n Puissance du rituel : ");
