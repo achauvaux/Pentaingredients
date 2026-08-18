@@ -18,7 +18,11 @@ apply plugin: 'io.github.fourlastor.construo'
 
 import io.github.fourlastor.construo.Target
 
-sourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]
+// Les assets vivent dans core/assets. On les embarque dans le jar en conservant le
+// prefixe "assets/", celui qu'attendent les appels Gdx.files.internal("assets/...").
+processResources {
+  from(project(':core').projectDir) { include 'assets/**' }
+}
 application.mainClass = 'com.nicolasgarland.pentaingredients.lwjgl3.Lwjgl3Launcher'
 application.applicationName = appName
 eclipse.project.name = appName + '-lwjgl3'
@@ -53,7 +57,9 @@ dependencies {
 def os = System.properties['os.name'].toLowerCase(Locale.ROOT)
 
 run {
-  workingDir = rootProject.file('assets').path
+  // Le repertoire de lancement doit contenir assets/ ; c'est core/, pas la racine.
+  // C'est aussi la que le jeu ecrit ses sauvegardes (saves/).
+  workingDir = project(':core').projectDir
 // You can uncomment the next line if your IDE claims a build failure even when the app closed properly.
   //setIgnoreExitValue(true)
   jvmArgs += "--enable-native-access=ALL-UNNAMED"
