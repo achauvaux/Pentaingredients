@@ -8,6 +8,19 @@ dependencies {
   if(enableGraalNative == 'true') {
     implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
   }
+
+  // Le moteur de regles (Arbitre) ne depend pas de libGDX : il se teste sans
+  // contexte graphique, avec de simples objets Ingredient / Positions / Level.
+  testImplementation "org.junit.jupiter:junit-jupiter:5.11.4"
+  testRuntimeOnly "org.junit.platform:junit-platform-launcher"
+}
+
+test {
+  useJUnitPlatform()
+  testLogging {
+    events "passed", "failed", "skipped"
+    exceptionFormat "full"
+  }
 }
 
 jar {
