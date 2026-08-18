@@ -28,7 +28,18 @@ public class Lwjgl3Launcher {
         //// useful for testing performance, but can also be very stressful to some hardware.
         //// You may also need to configure GPU drivers to fully disable Vsync; this can cause screen tearing.
 
-        configuration.setWindowedMode(1920, 1080);
+        //// La fenêtre démarre maximisée : elle remplit la zone de travail, barre
+        //// des tâches et décorations comprises.
+        ////
+        //// Demander directement 1920x1080 ne convenait pas : setWindowedMode fixe
+        //// la zone *client*, hors décorations. Sur un écran de cette taille, la
+        //// fenêtre occupait donc tout l'écran et ses 38 pixels de barre de titre
+        //// débordaient au-dessus du bord supérieur, hors de portée de la souris.
+        ////
+        //// 1280x720 reste la taille de repli, celle que retrouve la fenêtre quand
+        //// on la restaure. L'interface s'adapte : elle utilise un FitViewport.
+        configuration.setWindowedMode(1280, 720);
+        configuration.setMaximized(true);
         //// You can change these files; they are in lwjgl3/src/main/resources/ .
         //// They can also be loaded from the root of assets/ .
         configuration.setWindowIcon("libgdx128.png", "libgdx64.png", "libgdx32.png", "libgdx16.png");
