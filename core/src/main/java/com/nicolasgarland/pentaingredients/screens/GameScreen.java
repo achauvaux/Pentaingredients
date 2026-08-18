@@ -500,6 +500,28 @@ public class GameScreen implements Screen {
         return mainTable;
 	}
 	
+	/**
+	 * Rédige le verdict destiné au joueur. Le moteur de règles ne rend que des
+	 * valeurs : la formulation, elle, appartient à l'écran.
+	 */
+	private String messageDuResultat(Pentacle resultat) {
+		String message = "";
+
+		if(!resultat.sousControle) message += "Aïe ! Aïe ! Aïe ! Le sort n'est pas sous contrôle !\n";
+		if(!resultat.assezPuissant) message += "Humpf ! Le sort n'est pas assez puissant !\n";
+
+		if(resultat.estReussi()) {
+			switch(resultat.etoiles) {
+				case 3:  message += "Bravo !"; break;
+				case 2:  message += "Excellent !"; break;
+				case 1:  message += "Bien joué !"; break;
+				default: message += "Peu mieux faire"; break;
+			}
+		}
+
+		return message;
+	}
+
 	private void showResultatDialog() {
         Dialog resultDialog = new Dialog("Résultat de l'incantation", skin) {
             @Override
@@ -546,7 +568,7 @@ public class GameScreen implements Screen {
         mainTable.add(ctrlTable).center();
         mainTable.row();
         
-        mainTable.add(new Label(valid.description, skin, "default")).colspan(2).center();
+        mainTable.add(new Label(messageDuResultat(valid), skin, "default")).colspan(2).center();
 //        resultDialog.text(valid.description);
         
         resultDialog.getContentTable().add(mainTable).size(1000, 700);

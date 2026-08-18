@@ -49,44 +49,45 @@ public class Arbitre {
 		this.pos = pos;
 	}
 
+	/**
+	 * Évalue le pentagramme : additionne les cinq lignes, puis vérifie les deux
+	 * conditions de réussite sur chacune des six énergies.
+	 */
 	public Pentacle validerPentacle() {
-		String res = "";
-		Boolean isCtrlOk = true;
-		Boolean isPuisOk = true;
-		
+		boolean assezPuissant = true;
+		boolean sousControle = true;
+
 		int[][][] lignes = new int[NB_LIGNES][2][NB_ENERGIES];
-		
 		for(int a=0; a<NB_LIGNES; a++) lignes[a] = lignePuisCtrl(a+1);
-		
-		int[] puisTot = new int[] {0,0,0,0,0,0};
-		int[] ctrlTot = new int[] {0,0,0,0,0,0};
-		
+
+		int[] puisTot = new int[NB_ENERGIES];
+		int[] ctrlTot = new int[NB_ENERGIES];
+
 		for(int i=0; i<puisTot.length; i++) {
 			for(int a=0; a<NB_LIGNES; a++) {
 				puisTot[i] += lignes[a][0][i];
 				ctrlTot[i] += lignes[a][1][i];
 			}
-			if(ctrlTot[i] < puisTot[i]) isCtrlOk = false;
-			if(puisTot[i] < objectif.puissance[i]) isPuisOk = false;
+			if(ctrlTot[i] < puisTot[i]) sousControle = false;
+			if(puisTot[i] < objectif.puissance[i]) assezPuissant = false;
 		}
-		
-		if(!isCtrlOk) res += "Aïe ! Aïe ! Aïe ! Le sort n'est pas sous contrôle !\n";
-		if(!isPuisOk) res += "Humpf ! Le sort n'est pas assez puissant !\n";
-		
-		if(isCtrlOk && isPuisOk) {
-			int cout = coutTotal();
-			if(cout <= objectif.objectifs[2]) {
-				res += "Bravo !";
-			} else if(cout <= objectif.objectifs[1]) {
-				res += "Excellent !";
-			} else if(cout <= objectif.objectifs[0]) {
-				res += "Bien joué !";
-			} else {
-				res += "Peu mieux faire";
-			}
+
+		int cout = coutTotal();
+		int etoiles = (assezPuissant && sousControle) ? etoilesPour(cout) : 0;
+
+		return new Pentacle(puisTot, ctrlTot, assezPuissant, sousControle, cout, etoiles);
+	}
+
+	/**
+	 * Étoiles décernées pour un coût donné. Les trois seuils du niveau vont du
+	 * plus permissif, {@code objectifs[0]}, au plus exigeant, {@code objectifs[2]} :
+	 * moins le rituel coûte cher, plus il rapporte.
+	 */
+	private int etoilesPour(int cout) {
+		for(int etoiles = Pentacle.ETOILES_MAX; etoiles > 0; etoiles--) {
+			if(cout <= objectif.objectifs[etoiles - 1]) return etoiles;
 		}
-		// TODO Auto-generated method stub
-		return new Pentacle(puisTot, ctrlTot, res);
+		return 0;
 	}
 
 	public int coutTotal() {

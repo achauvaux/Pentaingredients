@@ -2,6 +2,7 @@ package com.nicolasgarland.pentaingredients.utils;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
@@ -191,10 +192,8 @@ class ArbitreTest {
 
 		assertArrayEquals(energies(2, 0, 0, 0, 0, 0), resultat.puissance, "puissance totale");
 		assertArrayEquals(energies(3, 0, 0, 0, 0, 0), resultat.controle, "contrôle total");
-		// TODO étape 4 : le verdict devrait être structuré, pas rédigé en français
-		// par le moteur. Ce test portera alors sur un rang, pas sur du texte.
-		assertTrue(resultat.description.contains("Bravo"),
-				"coût de 2000, sous le meilleur seuil, mais message : " + resultat.description);
+		assertTrue(resultat.estReussi());
+		assertEquals(3, resultat.etoiles, "coût de 2000, sous le seuil le plus exigeant");
 	}
 
 	@Test
@@ -204,7 +203,11 @@ class ArbitreTest {
 		Arbitre arbitre = arbitre(niveau,
 				new int[] {PONCE, FEU2_ANIMALE, 0, 0, 0}, new int[] {0, DRAGON, SALAMANDRE, 0, 0});
 
-		assertTrue(arbitre.validerPentacle().description.contains("pas assez puissant"));
+		Pentacle resultat = arbitre.validerPentacle();
+
+		assertFalse(resultat.assezPuissant, "2 Feu produits pour 5 exigés");
+		assertTrue(resultat.sousControle, "le contrôle, lui, était suffisant");
+		assertFalse(resultat.estReussi());
 	}
 
 	@Test
@@ -215,7 +218,44 @@ class ArbitreTest {
 		Arbitre arbitre = arbitre(niveau,
 				new int[] {PONCE, FEU2_ANIMALE, 0, 0, 0}, new int[] {0, 0, 0, 0, 0});
 
-		assertTrue(arbitre.validerPentacle().description.contains("sous contrôle"));
+		Pentacle resultat = arbitre.validerPentacle();
+
+		assertTrue(resultat.assezPuissant, "la puissance exigée est bien atteinte");
+		assertFalse(resultat.sousControle);
+		assertFalse(resultat.estReussi());
+	}
+
+	@Test
+	@DisplayName("Les étoiles suivent le coût, comparé aux trois seuils du niveau")
+	void etoilesSelonLeCout() {
+		// Le même pentagramme à 2000 pièces, jugé sur des seuils différents.
+		assertEquals(3, verdictAvecSeuils(3000, 2500, 2000).etoiles, "sous le seuil le plus exigeant");
+		assertEquals(2, verdictAvecSeuils(3000, 2500, 1900).etoiles, "sous le seuil intermédiaire");
+		assertEquals(1, verdictAvecSeuils(3000, 1950, 1900).etoiles, "sous le seuil le plus permissif");
+		assertEquals(0, verdictAvecSeuils(1900, 1850, 1800).etoiles, "au-dessus des trois seuils");
+	}
+
+	@Test
+	@DisplayName("Un rituel raté ne rapporte aucune étoile, même s'il est bon marché")
+	void rituelRateNeRapporteRien() {
+		// Puissance suffisante mais aucun contrôle : l'échec prime sur le coût.
+		Level niveau = niveau(energies(2, 0, 0, 0, 0, 0), new int[] {9000, 8000, 7000});
+		Arbitre arbitre = arbitre(niveau,
+				new int[] {PONCE, FEU2_ANIMALE, 0, 0, 0}, new int[] {0, 0, 0, 0, 0});
+
+		Pentacle resultat = arbitre.validerPentacle();
+
+		assertFalse(resultat.estReussi());
+		assertEquals(0, resultat.etoiles);
+		assertEquals(600, resultat.cout, "le coût reste calculé, il n'est simplement pas récompensé");
+	}
+
+	/** Le pentagramme réussi à 2000 pièces, jugé sur les seuils fournis. */
+	private Pentacle verdictAvecSeuils(int premier, int deuxieme, int troisieme) {
+		Level niveau = niveau(energies(2, 0, 0, 0, 0, 0), new int[] {premier, deuxieme, troisieme});
+		return arbitre(niveau,
+				new int[] {PONCE, FEU2_ANIMALE, 0, 0, 0}, new int[] {0, DRAGON, SALAMANDRE, 0, 0})
+				.validerPentacle();
 	}
 
 	// ------------------------------------------------------------------- coût
@@ -245,7 +285,7 @@ class ArbitreTest {
 		assertEquals(3, resultat.puissance[FEU]);
 		assertEquals(0, resultat.puissance[TERRE], "la Terre n'est pas commune aux deux ingrédients");
 		assertEquals(0, resultat.puissance[FOUDRE], "la Foudre non plus");
-		assertTrue(resultat.description.contains("sous contrôle"), "aucun contrôle n'a été posé");
+		assertFalse(resultat.sousControle, "aucun contrôle n'a été posé");
 	}
 
 	// ------------------------------------------------ topologie des cinq lignes
