@@ -35,15 +35,15 @@ public class LevelSelectScreen implements Screen {
 
 	@Override
 	public void show() {
-	    // TODO Charger le fond d'Ècran
+	    // TODO Charger le fond d'√©cran
         background = new Texture(Gdx.files.internal("assets/menu_background.png"));
 
-        // CrÈer le Stage et le Viewport
+        // Cr√©er le Stage et le Viewport
         stage = new Stage();
 
         // Charger la Skin
         skin = new Skin(Gdx.files.internal("assets/skin/uiskin.json"));
-//        BitmapFont font = new BitmapFont(); // Police par dÈfaut
+//        BitmapFont font = new BitmapFont(); // Police par d√©faut
 //        Label.LabelStyle labelStyleTitle = new Label.LabelStyle(font, Color.GOLD);
 //        skin.add("title", labelStyleTitle);
 
@@ -52,13 +52,13 @@ public class LevelSelectScreen implements Screen {
         // Charger les niveaux
         loadLevels();
 
-        // CrÈer la table des niveaux
+        // Cr√©er la table des niveaux
         createLevelsTable();
 
         // Ajouter un bouton "Retour"
         addBackButton();
 
-        // DÈfinir l'InputProcessor
+        // D√©finir l'InputProcessor
         Gdx.input.setInputProcessor(stage);
 	}
 
@@ -75,12 +75,12 @@ public class LevelSelectScreen implements Screen {
 	}
 
 	private void createLevelsTable() {
-	    // CrÈer une table pour organiser les niveaux
+	    // Cr√©er une table pour organiser les niveaux
         levelsTable = new Table();
         levelsTable.defaults().pad(10);
 
         // Ajouter un titre
-        Label titleLabel = new Label("SÈlection des Niveaux", skin, "title");
+        Label titleLabel = new Label("S√©lection des Niveaux", skin, "title");
 //        titleLabel.setColor(Color.GOLD);
         levelsTable.add(titleLabel).colspan(3).center();
         levelsTable.row();
@@ -104,14 +104,14 @@ public class LevelSelectScreen implements Screen {
             
             levelsTable.add(levelButton).width(200).height(60);
         }
-        // TODO ajouter des Ètoiles pour les niveaux dÈj‡ rÈussis
+        // TODO ajouter des √©toiles pour les niveaux d√©j√† r√©ussis
 
-        // CrÈer un ScrollPane pour permettre le dÈfilement (utile pour mobile)
+        // Cr√©er un ScrollPane pour permettre le d√©filement (utile pour mobile)
         ScrollPane scrollPane = new ScrollPane(levelsTable, skin);
-        scrollPane.setScrollingDisabled(true, false); // DÈsactiver le dÈfilement vertical
+        scrollPane.setScrollingDisabled(true, false); // D√©sactiver le d√©filement vertical
         scrollPane.setFlickScroll(true); // Permettre le flick (glisser rapidement)
 
-        // Ajouter le ScrollPane ‡ la scËne
+        // Ajouter le ScrollPane √† la sc√®ne
         Table mainTable = new Table();
         mainTable.setFillParent(true);
         mainTable.add(scrollPane).expand().fill();
@@ -132,7 +132,7 @@ public class LevelSelectScreen implements Screen {
 
 	@Override
 	public void render(float delta) {
-        // Effacer l'Ècran
+        // Effacer l'√©cran
         ScreenUtils.clear(0, 0, 0, 1);
 
         // Dessiner le fond
@@ -140,7 +140,7 @@ public class LevelSelectScreen implements Screen {
         game.batch.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         game.batch.end();
 
-        // Mettre ‡ jour et dessiner le Stage
+        // Mettre √† jour et dessiner le Stage
         stage.act(delta);
         stage.draw();
 	}

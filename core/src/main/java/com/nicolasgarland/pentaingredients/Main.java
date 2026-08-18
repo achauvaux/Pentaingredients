@@ -14,11 +14,11 @@ package com.nicolasgarland.pentaingredients;
 //    public void create() {
 //        batch = new SpriteBatch();
 //        image = new Texture("libgdx.png");
-//        System.out.println("Mon jeu de casse-tête est lancé !");
+//        System.out.println("Mon jeu de casse-tÃªte est lancÃ© !");
 //        LevelManager levelManager = new LevelManager();
 //        levelManager.loadLevels();
 //        Level level1 = levelManager.getLevel(1);
-//        System.out.println("Niveau chargé : " + level1.name);
+//        System.out.println("Niveau chargÃ© : " + level1.name);
 //    }
 //
 //    @Override
@@ -59,12 +59,12 @@ public class Main extends Game {
      	font.setUseIntegerPositions(false);
      	font.getData().setScale(viewport.getWorldHeight() / Gdx.graphics.getHeight());
      		
-        this.setScreen(new MainMenuScreen(this)); // Affiche le menu au démarrage
+        this.setScreen(new MainMenuScreen(this)); // Affiche le menu au dÃ©marrage
     }
 
     @Override
     public void render() {
-        super.render(); // Appelle le render() de l'écran actuel
+        super.render(); // Appelle le render() de l'Ã©cran actuel
     }
 
     @Override

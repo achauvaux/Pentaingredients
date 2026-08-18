@@ -32,7 +32,7 @@ public class OptionsScreen implements Screen {
         // TODO Charger le fond
         background = new Texture(Gdx.files.internal("assets/menu_background.png"));
 
-        // Créer la scène et le viewport
+        // CrÃ©er la scÃ¨ne et le viewport
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
 
@@ -43,11 +43,11 @@ public class OptionsScreen implements Screen {
 
         // TODO ajouter de quoi faire varier le son, et ajouter des sons
         
-        // TODO ajouter de quoi faire varier la résolution
+        // TODO ajouter de quoi faire varier la rÃ©solution
         
-        // Créer les boutons
+        // CrÃ©er les boutons
         TextButton returnButton = new TextButton("Retour", skin, "default");
-        TextButton rulesButton = new TextButton("Règles", skin, "default");
+        TextButton rulesButton = new TextButton("RÃ¨gles", skin, "default");
 
         // Positionner les boutons
         rulesButton.setPosition(
@@ -74,13 +74,13 @@ public class OptionsScreen implements Screen {
         });
 
         // TODO taille des boutons
-        // Ajouter les boutons à la scène
+        // Ajouter les boutons Ã  la scÃ¨ne
         stage.addActor(rulesButton);
         stage.addActor(returnButton);
     }
     
     private void showRulesDialog() {
-        Dialog rulesDialog = new Dialog("Règles du Jeu", skin) {
+        Dialog rulesDialog = new Dialog("RÃ¨gles du Jeu", skin) {
             @Override
             protected void result(Object object) {
                 // Called when a button is clicked
@@ -89,7 +89,7 @@ public class OptionsScreen implements Screen {
 
         // Ajouter du texte
         rulesDialog.text(Gdx.files.internal("assets/rules.txt").readString());
-        // TODO écrire les règles
+        // TODO Ã©crire les rÃ¨gles
 
         // Ajouter un bouton "Fermer"
         rulesDialog.button("Fermer");
@@ -99,10 +99,10 @@ public class OptionsScreen implements Screen {
     }
 
     private Skin createFallbackSkin() {
-        // Créer une skin de secours
+        // CrÃ©er une skin de secours
         Skin fallbackSkin = new Skin();
 
-        // Créer une texture de secours pour les boutons
+        // CrÃ©er une texture de secours pour les boutons
         Pixmap pixmap = new Pixmap(200, 50, Pixmap.Format.RGB888);
         pixmap.setColor(Color.GRAY);
         pixmap.fill();
@@ -112,11 +112,11 @@ public class OptionsScreen implements Screen {
         pixmap.fill();
         fallbackSkin.add("button_down", new Texture(pixmap));
 
-        // Créer une police de secours
+        // CrÃ©er une police de secours
         BitmapFont font = new BitmapFont();
         fallbackSkin.add("default-font", font);
 
-        // Créer un style de bouton de secours
+        // CrÃ©er un style de bouton de secours
         TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
         textButtonStyle.up = fallbackSkin.newDrawable("button_up", Color.GRAY);
         textButtonStyle.down = fallbackSkin.newDrawable("button_down", Color.DARK_GRAY);
@@ -128,7 +128,7 @@ public class OptionsScreen implements Screen {
     
     @Override
     public void render(float delta) {
-        // Effacer l'écran
+        // Effacer l'Ã©cran
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
@@ -137,7 +137,7 @@ public class OptionsScreen implements Screen {
 //        game.batch.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 //        game.batch.end();
 
-        // Dessiner la scène (boutons)
+        // Dessiner la scÃ¨ne (boutons)
         stage.act(delta);
         stage.draw();
 	}

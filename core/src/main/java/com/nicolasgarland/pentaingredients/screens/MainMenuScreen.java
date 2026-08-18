@@ -32,7 +32,7 @@ public class MainMenuScreen implements Screen {
         // TODO Charger le fond
         background = new Texture(Gdx.files.internal("assets/menu_background.png"));
 
-        // Créer la scène et le viewport
+        // CrÃ©er la scÃ¨ne et le viewport
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
 
@@ -41,7 +41,7 @@ public class MainMenuScreen implements Screen {
         skin = new Skin(Gdx.files.internal("assets/skin/uiskin.json"));
 //        skin = createFallbackSkin();
 
-        // Créer les boutons
+        // CrÃ©er les boutons
         TextButton playButton = new TextButton("Jouer", skin, "default");
         TextButton optionsButton = new TextButton("Options", skin, "default");
         TextButton exitButton = new TextButton("Quitter", skin, "default");
@@ -83,17 +83,17 @@ public class MainMenuScreen implements Screen {
         });
 
         // TODO taille des boutons
-        // Ajouter les boutons à la scène
+        // Ajouter les boutons Ã  la scÃ¨ne
         stage.addActor(playButton);
         stage.addActor(optionsButton);
         stage.addActor(exitButton);
     }
 
     private Skin createFallbackSkin() {
-        // Créer une skin de secours
+        // CrÃ©er une skin de secours
         Skin fallbackSkin = new Skin();
 
-        // Créer une texture de secours pour les boutons
+        // CrÃ©er une texture de secours pour les boutons
         Pixmap pixmap = new Pixmap(200, 50, Pixmap.Format.RGB888);
         pixmap.setColor(Color.GRAY);
         pixmap.fill();
@@ -103,11 +103,11 @@ public class MainMenuScreen implements Screen {
         pixmap.fill();
         fallbackSkin.add("button_down", new Texture(pixmap));
 
-        // Créer une police de secours
+        // CrÃ©er une police de secours
         BitmapFont font = new BitmapFont();
         fallbackSkin.add("default-font", font);
 
-        // Créer un style de bouton de secours
+        // CrÃ©er un style de bouton de secours
         TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
         textButtonStyle.up = fallbackSkin.newDrawable("button_up", Color.GRAY);
         textButtonStyle.down = fallbackSkin.newDrawable("button_down", Color.DARK_GRAY);
@@ -119,7 +119,7 @@ public class MainMenuScreen implements Screen {
     
     @Override
     public void render(float delta) {
-        // Effacer l'écran
+        // Effacer l'Ã©cran
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
@@ -128,7 +128,7 @@ public class MainMenuScreen implements Screen {
 //        game.batch.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 //        game.batch.end();
 
-        // Dessiner la scène (boutons)
+        // Dessiner la scÃ¨ne (boutons)
         stage.act(delta);
         stage.draw();
 	}

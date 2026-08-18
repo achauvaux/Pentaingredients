@@ -12,7 +12,7 @@ public class InventorySlot extends Actor {
     public static final int SLOT_SIZE = 64;  // Taille d'une case (en pixels)
     private TextureRegion slotTexture;       // Texture de fond de la case
     private Ingredient item;              // Objet dans cette case (null si vide)
-    private boolean isSelected;               // Case sélectionnée ?
+    private boolean isSelected;               // Case sÃ©lectionnÃ©e ?
     private Positions.Emplacement posEmpl;
     private int posInt;
     
@@ -39,7 +39,7 @@ public class InventorySlot extends Actor {
         // Dessiner le fond de la case
         batch.draw(slotTexture, getX(), getY(), getWidth(), getHeight());
 
-        // Dessiner une bordure si la case est sélectionnée
+        // Dessiner une bordure si la case est sÃ©lectionnÃ©e
         if (isSelected()) {
             batch.setColor(Color.YELLOW);
             batch.draw(slotTexture, getX() - 2, getY() - 2, getWidth() + 4, getHeight() + 4);
@@ -52,7 +52,7 @@ public class InventorySlot extends Actor {
         }
     }
 
-    // Méthodes pour gérer l'objet
+    // MÃ©thodes pour gÃ©rer l'objet
     public void setItem(Ingredient item) {
         this.item = item;
     }

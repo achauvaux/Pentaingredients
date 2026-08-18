@@ -16,7 +16,7 @@ public class Ingredient {
 	public Famille famille;
 	public int cout;
 	public int[] energies;
-	public Texture icon; // Icône de l'objet
+	public Texture icon; // IcÃ´ne de l'objet
     
 	
 	public Ingredient() {};

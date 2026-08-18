@@ -36,7 +36,7 @@ public class Arbitre {
 			if(puisTot[i] < objectif.puissance[i]) isPuisOk = false;
 		}
 		
-		if(!isCtrlOk) res += "Aïe ! Aïe ! Aïe ! Le sort n'est pas sous contrôle !\n";
+		if(!isCtrlOk) res += "AÃ¯e ! AÃ¯e ! AÃ¯e ! Le sort n'est pas sous contrÃ´le !\n";
 		if(!isPuisOk) res += "Humpf ! Le sort n'est pas assez puissant !\n";
 		
 		if(isCtrlOk && isPuisOk) {
@@ -46,7 +46,7 @@ public class Arbitre {
 			} else if(cout <= objectif.objectifs[1]) {
 				res += "Excellent !";
 			} else if(cout <= objectif.objectifs[0]) {
-				res += "Bien joué !";
+				res += "Bien jouÃ© !";
 			} else {
 				res += "Peu mieux faire";
 			}

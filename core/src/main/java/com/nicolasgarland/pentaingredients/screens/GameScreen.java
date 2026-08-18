@@ -103,7 +103,7 @@ public class GameScreen implements Screen {
         this.imgLignes = new Image[] {new Image(okLine), new Image(okLine), new Image(okLine), new Image(okLine), new Image(okLine)};
         this.arbitre = new Arbitre(thisLevel, listOfIngredients, thisPositions);
         this.synergies = new int[] {1,1,1,1,1};
-        this.puisCtrlLignes = new int[][][] { // [ligne][2][énergies]
+        this.puisCtrlLignes = new int[][][] { // [ligne][2][Ã©nergies]
         	{
         		{0,0,0,0,0,0},
         		{0,0,0,0,0,0}
@@ -136,13 +136,13 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void show() {
-	    // Charger le fond d'écran
+	    // Charger le fond d'Ã©cran
         background = new Texture(Gdx.files.internal("assets/menu_background.png"));
 
-        // Créer Viewport
+        // CrÃ©er Viewport
         FitViewport viewport = new FitViewport(1920, 1080);
 
-        // Créer les Stage
+        // CrÃ©er les Stage
         metaStage = new Stage(viewport);
 
         // charger la skin
@@ -159,15 +159,15 @@ public class GameScreen implements Screen {
         metaStage.addActor(metaTable);
 //        metaTable.setDebug(true);
 
-        // Définir les InputProcessor
+        // DÃ©finir les InputProcessor
         Gdx.input.setInputProcessor(metaStage);
 	}
 
 	private Actor addActorsToLeftStage() {
 		Table mainTable = new Table();
 
-		// bouton de règles
-		TextButton rulesButton = new TextButton("Règles", skin, "default");
+		// bouton de rÃ¨gles
+		TextButton rulesButton = new TextButton("RÃ¨gles", skin, "default");
 		rulesButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -199,11 +199,11 @@ public class GameScreen implements Screen {
 		Table mainTable = new Table();
 
 		// titre du niveau
-		Label titleLabel = new Label("Etagères", skin, "title");
+		Label titleLabel = new Label("EtagÃ¨res", skin, "title");
 		mainTable.add(titleLabel).center();
 	    mainTable.row();
 		
-	    // table des ingrédients sur les étagères
+	    // table des ingrÃ©dients sur les Ã©tagÃ¨res
 //		InventorySlot[][] slots = new InventorySlot[10][10];
         Table inventoryTable = new Table();
 
@@ -213,7 +213,7 @@ public class GameScreen implements Screen {
                 
             	int idIng = thisPositions.etagere[row][col];
             	if(idIng != 0) slot.setItem(listOfIngredients.get(idIng-1));
-                // Ajouter un écouteur pour les clics
+                // Ajouter un Ã©couteur pour les clics
             	slot.addListener(new ClickListener() {
             		@Override
             		public void clicked(InputEvent event, float x, float y) {
@@ -222,18 +222,18 @@ public class GameScreen implements Screen {
             	});
                 inventoryTable.add(slot).size(InventorySlot.SLOT_SIZE);
             }
-            inventoryTable.row();  // Nouvelle ligne après chaque rangée
+            inventoryTable.row();  // Nouvelle ligne aprÃ¨s chaque rangÃ©e
         }
         mainTable.add(inventoryTable).center();
         mainTable.row();
         
-        // description de l'ingrédient sélectionné
-        Window infoWindow = new Window("Ingrédient sélectionné :", skin);
+        // description de l'ingrÃ©dient sÃ©lectionnÃ©
+        Window infoWindow = new Window("IngrÃ©dient sÃ©lectionnÃ© :", skin);
         Table ingrSelectedTable = new Table();
 
        	infoIcon = new Image(emptySlot);
         ingrSelectedTable.add(infoIcon).size(64).align(Align.left);
-        infoName = new Label("Aucun ingrédient sélectionné", skin, "default");
+        infoName = new Label("Aucun ingrÃ©dient sÃ©lectionnÃ©", skin, "default");
         ingrSelectedTable.add(infoName).align(Align.left);
         ingrSelectedTable.row();
         elemTable = new Table();
@@ -249,8 +249,8 @@ public class GameScreen implements Screen {
 		mainTable.add(infoWindow).center();
         mainTable.row();
 
-        // bouton réinitialiser position
-        TextButton resetButton = new TextButton("Réinitialisation", skin);
+        // bouton rÃ©initialiser position
+        TextButton resetButton = new TextButton("RÃ©initialisation", skin);
         resetButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -276,7 +276,7 @@ public class GameScreen implements Screen {
 					selectedSlot = slot;					
 				}
 			} else {
-				// permute puis déselectionne tout
+				// permute puis dÃ©selectionne tout
 				Ingredient ingr = slot.getItem();
 				slot.setItem(selectedSlot.getItem());
 				selectedSlot.setItem(ingr);
@@ -288,9 +288,9 @@ public class GameScreen implements Screen {
 				if(slot.getPosEmpl()==Emplacement.CONTROLE || slot.getPosEmpl()==Emplacement.PUISSANCE || 
 				   selectedSlot.getPosEmpl()==Emplacement.CONTROLE || selectedSlot.getPosEmpl()==Emplacement.PUISSANCE) {
 					// recalcule le coutTotal
-					coutTotalLabel.setText("Coût total : " + arbitre.coutTotal()) ;
+					coutTotalLabel.setText("CoÃ»t total : " + arbitre.coutTotal()) ;
 					
-					//recalcule les lignes et les énergies dessus/dessous
+					//recalcule les lignes et les Ã©nergies dessus/dessous
 					for(int i=0; i<5; i++) {
 						synergies[i] = arbitre.multLigneSynergie(i+1);
 						switch(synergies[i]) {
@@ -326,7 +326,7 @@ public class GameScreen implements Screen {
 	        infoIcon.setDrawable(new TextureRegionDrawable(item.getIcon()));
 	    	infoName.setText(item.name);
 	    	infoFamily.setText(item.famille.toString());
-	    	infoCout.setText("Coût : "+item.cout);
+	    	infoCout.setText("CoÃ»t : "+item.cout);
 	    	elemTable.clear();
 	    	fillElemTable(elemTable, item.energies, 64);
 //	        for(int i=0 ; i<6 ; i++) {
@@ -336,7 +336,7 @@ public class GameScreen implements Screen {
 //	        }
 	    } else {
 	    	infoIcon.setDrawable(new TextureRegionDrawable(emptySlot));
-	    	infoName.setText("Aucun ingrédient sélectionné");
+	    	infoName.setText("Aucun ingrÃ©dient sÃ©lectionnÃ©");
 	    	infoFamily.setText("");
 	    	infoCout.setText("");
 	    	elemTable.clear();
@@ -366,7 +366,7 @@ public class GameScreen implements Screen {
 //        	for(int j=0 ; j < thisLevel.puissance[i] ; j++) {
 //        		Image img = new Image(elements[i]);
 //        		elemTable.add(img).size(64);
-////        	    Gdx.app.log("DEBUG", "element n°"+i+" size : " + img.getWidth()+" x "+img.getHeight());
+////        	    Gdx.app.log("DEBUG", "element nÂ°"+i+" size : " + img.getWidth()+" x "+img.getHeight());
 //        	}
 //        }
         levelTable.add(elemTable).colspan(3).center();
@@ -382,9 +382,9 @@ public class GameScreen implements Screen {
 	    
 		mainTable.add(levelTable).colspan(2).center();
 	    mainTable.row();
-	    // TODO : mettre dans une window + supperposer étoile et valeur
+	    // TODO : mettre dans une window + supperposer Ã©toile et valeur
 		
-	    // Créer un groupe pour les acteurs du pentagramme
+	    // CrÃ©er un groupe pour les acteurs du pentagramme
 	    Group pentagramGroup = new Group();
 	    // image pentagramme
 	    Image img = new Image(new Texture(Gdx.files.internal("assets/skin/Pentagramme.PNG")));
@@ -463,7 +463,7 @@ public class GameScreen implements Screen {
 	    	if(idIng != 0) slotP.setItem(listOfIngredients.get(idIng-1));
 	    	slotP.setPosition(	PENTAILLE/2*(1+slotPositionsPuissance[i][0])-slotP.getWidth()/2, 
 	    						PENTAILLE/2*(1+slotPositionsPuissance[i][1])-slotP.getHeight()/2);
-            // Ajouter un écouteur pour les clics
+            // Ajouter un Ã©couteur pour les clics
         	slotP.addListener(new ClickListener() {
         		@Override
         		public void clicked(InputEvent event, float x, float y) {
@@ -486,7 +486,7 @@ public class GameScreen implements Screen {
 	    	if(idIng != 0) slotC.setItem(listOfIngredients.get(idIng-1));
 	    	slotC.setPosition(	PENTAILLE/2*(1+slotPositionsControle[i][0])-slotC.getWidth()/2, 
 	    						PENTAILLE/2*(1+slotPositionsControle[i][1])-slotC.getHeight()/2);
-            // Ajouter un écouteur pour les clics
+            // Ajouter un Ã©couteur pour les clics
         	slotC.addListener(new ClickListener() {
         		@Override
         		public void clicked(InputEvent event, float x, float y) {
@@ -499,7 +499,7 @@ public class GameScreen implements Screen {
 	    mainTable.add(pentagramGroup).pad(50).colspan(2).size(PENTAILLE, PENTAILLE);
 	    
 	    mainTable.row();
-	    coutTotalLabel = new Label("Coût total : " + arbitre.coutTotal(), skin, "default");
+	    coutTotalLabel = new Label("CoÃ»t total : " + arbitre.coutTotal(), skin, "default");
 	    mainTable.add(coutTotalLabel).align(Align.left);
 	    
 	    TextButton validButton = new TextButton("Lancer l'incantation", skin);
@@ -518,7 +518,7 @@ public class GameScreen implements Screen {
 	}
 	
 	private void showResultatDialog() {
-        Dialog resultDialog = new Dialog("Résultat de l'incantation", skin) {
+        Dialog resultDialog = new Dialog("RÃ©sultat de l'incantation", skin) {
             @Override
             protected void result(Object object) {
                 if (object.equals("return")) {
@@ -556,8 +556,8 @@ public class GameScreen implements Screen {
         mainTable.add(puissTable).center();
         mainTable.row();
         
-        mainTable.add(new Label(" Contrôle du rituel : ", skin, "default")).align(Align.left);
-//        rulesDialog.text("\n Contrôle du rituel : ");
+        mainTable.add(new Label(" ContrÃ´le du rituel : ", skin, "default")).align(Align.left);
+//        rulesDialog.text("\n ContrÃ´le du rituel : ");
         Table ctrlTable = new Table();
         fillElemTable(ctrlTable, valid.controle, 64);
         mainTable.add(ctrlTable).center();
@@ -578,7 +578,7 @@ public class GameScreen implements Screen {
 	}
 
 	private void showRulesDialog() {
-        Dialog rulesDialog = new Dialog("Règles du Jeu", skin) {
+        Dialog rulesDialog = new Dialog("RÃ¨gles du Jeu", skin) {
             @Override
             protected void result(Object object) {
                 // Called when a button is clicked
@@ -597,21 +597,21 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void render(float delta) {
-        // Effacer l'écran
+        // Effacer l'Ã©cran
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        // Mettre à jour et dessiner chaque Stage
+        // Mettre Ã  jour et dessiner chaque Stage
         metaStage.act(delta);
         metaStage.draw();
 	}
 
 	@Override
 	public void resize(int width, int height) {
-	    // Mettre à jour les Viewports
+	    // Mettre Ã  jour les Viewports
 		metaStage.getViewport().update(width, height, true);
 
-	    // Redéfinir les ScreenBounds
+	    // RedÃ©finir les ScreenBounds
 		metaStage.getViewport().setScreenBounds(0, 0, width, height);
 	}
 
