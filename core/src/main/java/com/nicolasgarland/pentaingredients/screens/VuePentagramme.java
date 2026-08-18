@@ -1,6 +1,7 @@
 package com.nicolasgarland.pentaingredients.screens;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -81,7 +82,12 @@ public class VuePentagramme {
 
 	private final Image[] traits = new Image[Arbitre.NB_LIGNES];
 	private final Table[][] energiesParLigne = new Table[Arbitre.NB_LIGNES][2];
+
+	/** Dernière synergie affichée par ligne, pour ne signaler que ce qui change. */
+	private final int[] synergieAffichee = new int[Arbitre.NB_LIGNES];
+
 	private Label coutTotal;
+	private Image lueur;
 
 	public VuePentagramme(Partie partie, Skin skin, RessourcesJeu ressources,
 			IngredientIcons icones, EcouteurDeSlot ecouteur, Runnable surIncantation) {
@@ -160,11 +166,13 @@ public class VuePentagramme {
 		Group groupe = new Group();
 
 		// La lueur d'abord : tout le reste se pose dessus.
-		Image lueur = new Image(ressources.lueur);
+		lueur = new Image(ressources.lueur);
 		lueur.setColor(Palette.BRAISE.r, Palette.BRAISE.g, Palette.BRAISE.b, 0.22f);
 		lueur.setSize(COTE * 1.7f, COTE * 1.7f);
 		lueur.setPosition((COTE - lueur.getWidth()) / 2f, (COTE - lueur.getHeight()) / 2f);
+		lueur.setOrigin(com.badlogic.gdx.utils.Align.center);
 		groupe.addActor(lueur);
+		respirer();
 
 		Image trace = new Image(ressources.pentagramme);
 		trace.setColor(Palette.OR);
@@ -174,7 +182,8 @@ public class VuePentagramme {
 
 		for (int ligne = 0; ligne < Arbitre.NB_LIGNES; ligne++) {
 			Image trait = traits[ligne];
-			trait.setColor(couleurSelonSynergie(partie.synergie(ligne + 1)));
+			synergieAffichee[ligne] = partie.synergie(ligne + 1);
+			trait.setColor(couleurSelonSynergie(synergieAffichee[ligne]));
 			trait.setWidth(COTE - 50);
 			trait.setHeight(128);
 			trait.setRotation(ANGLE_DES_TRAITS[ligne]);
@@ -236,7 +245,19 @@ public class VuePentagramme {
 		coutTotal.setText("Coût total : " + partie.coutTotal());
 
 		for (int ligne = 0; ligne < Arbitre.NB_LIGNES; ligne++) {
-			traits[ligne].setColor(couleurSelonSynergie(partie.synergie(ligne + 1)));
+			int synergie = partie.synergie(ligne + 1);
+			Color cible = couleurSelonSynergie(synergie);
+
+			if (synergie != synergieAffichee[ligne]) {
+				// La ligne vient de changer de valeur : un éclair blanc qui retombe
+				// sur sa nouvelle couleur le fait remarquer.
+				traits[ligne].clearActions();
+				traits[ligne].setColor(Color.WHITE);
+				traits[ligne].addAction(Actions.color(cible, 0.45f));
+				synergieAffichee[ligne] = synergie;
+			} else {
+				traits[ligne].setColor(cible);
+			}
 
 			int[][] energies = partie.energiesDeLaLigne(ligne + 1);
 			for (int role = 0; role < 2; role++) {
@@ -250,6 +271,31 @@ public class VuePentagramme {
 	 * La couleur du trait dit ce que vaut la ligne : cendre quand elle est
 	 * éteinte, braise quand elle compte double, parchemin le reste du temps.
 	 */
+	/** Souffle lent de la chandelle, tant qu'aucune incantation ne l'emporte. */
+	private void respirer() {
+		lueur.addAction(Actions.forever(Actions.sequence(
+				Actions.alpha(0.27f, 1.7f, Interpolation.sine),
+				Actions.alpha(0.17f, 2.3f, Interpolation.sine))));
+	}
+
+	/** Embrasement bref du pentagramme, au lancement du rituel. */
+	public void flamboyer() {
+		lueur.clearActions();
+		lueur.addAction(Actions.sequence(
+				Actions.parallel(
+						Actions.alpha(0.80f, 0.16f, Interpolation.pow2Out),
+						Actions.scaleTo(1.25f, 1.25f, 0.16f, Interpolation.pow2Out)),
+				Actions.parallel(
+						Actions.alpha(0.22f, 0.85f, Interpolation.pow2In),
+						Actions.scaleTo(1f, 1f, 0.85f, Interpolation.pow2In)),
+				Actions.run(new Runnable() {
+					@Override
+					public void run() {
+						respirer();
+					}
+				})));
+	}
+
 	private Color couleurSelonSynergie(int synergie) {
 		switch (synergie) {
 			case Arbitre.SYNERGIE_NULLE:

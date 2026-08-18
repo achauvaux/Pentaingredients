@@ -1,6 +1,9 @@
 package com.nicolasgarland.pentaingredients.actors;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -22,6 +25,9 @@ public class InventorySlot extends Actor {
     /** Sur l'étagère, une case vide s'efface ; sur le pentagramme, elle appelle. */
     private boolean discretSiVide;
 
+    /** Temps écoulé, qui fait battre la surbrillance de la case sélectionnée. */
+    private float temps;
+
     public InventorySlot(TextureRegion slotTexture, Emplacement empl, int num, IngredientIcons icones) {
         this.slotTexture = slotTexture;
         this.icones = icones;
@@ -33,28 +39,51 @@ public class InventorySlot extends Actor {
     }
 
     @Override
+    public void act(float delta) {
+        super.act(delta);
+        temps += delta;
+    }
+
+    @Override
     public void draw(Batch batch, float parentAlpha) {
+        // L'acteur se dessine à la main : c'est ici, et nulle part ailleurs, que
+        // l'échelle animée doit être appliquée. Elle rayonne depuis le centre.
+        float largeur = getWidth() * getScaleX();
+        float hauteur = getHeight() * getScaleY();
+        float x = getX() + (getWidth() - largeur) / 2f;
+        float y = getY() + (getHeight() - hauteur) / 2f;
+
         Color couleur = getColor();
         float opacite = couleur.a * parentAlpha * (discretSiVide && item == null ? 0.35f : 1f);
         batch.setColor(couleur.r, couleur.g, couleur.b, opacite);
-        batch.draw(slotTexture, getX(), getY(), getWidth(), getHeight());
+        batch.draw(slotTexture, x, y, largeur, hauteur);
 
-        // Dessiner une bordure si la case est sélectionnée
+        // La case sélectionnée respire, plutôt que de porter un liseré figé
         if (isSelected()) {
-            batch.setColor(Color.YELLOW);
-            batch.draw(slotTexture, getX() - 2, getY() - 2, getWidth() + 4, getHeight() + 4);
+            float battement = 0.55f + 0.45f * MathUtils.sin(temps * 6f);
+            batch.setColor(Color.YELLOW.r, Color.YELLOW.g, Color.YELLOW.b, battement * parentAlpha);
+            batch.draw(slotTexture, x - 2, y - 2, largeur + 4, hauteur + 4);
         }
 
         // L'icône garde ses propres couleurs, elle n'hérite pas de la teinte du cadre
         if (item != null) {
             Texture icone = icones.get(item.id);
             if (icone != null) {
-                batch.setColor(Color.WHITE);
-                batch.draw(icone, getX() + 5, getY() + 5, getWidth() - 10, getHeight() - 10);
+                batch.setColor(1f, 1f, 1f, parentAlpha);
+                batch.draw(icone, x + 5, y + 5, largeur - 10, hauteur - 10);
             }
         }
 
         batch.setColor(Color.WHITE);
+    }
+
+    /** Petit sursaut, pour signaler qu'un ingrédient vient d'atterrir ici. */
+    public void animerPose() {
+        clearActions();
+        setScale(1f);
+        addAction(Actions.sequence(
+                Actions.scaleTo(1.28f, 1.28f, 0.09f, Interpolation.pow2Out),
+                Actions.scaleTo(1f, 1f, 0.17f, Interpolation.pow2In)));
     }
 
     /** Atténue le cadre tant qu'aucun ingrédient n'occupe la case. */

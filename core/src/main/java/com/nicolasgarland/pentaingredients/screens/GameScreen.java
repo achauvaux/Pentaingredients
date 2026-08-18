@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -64,7 +65,14 @@ public class GameScreen implements Screen, EcouteurDeSlot {
 					@Override
 					public void run() {
 						partie.sauvegarder();
-						afficherResultat();
+						// Le pentagramme s'embrase, puis le verdict tombe.
+						vuePentagramme.flamboyer();
+						metaStage.addAction(Actions.delay(0.45f, Actions.run(new Runnable() {
+							@Override
+							public void run() {
+								afficherResultat();
+							}
+						})));
 					}
 				});
 
@@ -87,6 +95,10 @@ public class GameScreen implements Screen, EcouteurDeSlot {
 		metaTable.add(panneauGauche());
 		metaTable.add(vuePentagramme.construire()).expand();
 		metaTable.add(vueEtagere.construire()).expand();
+
+		// Le plateau se révèle plutôt qu'il n'apparaît d'un coup.
+		metaTable.getColor().a = 0f;
+		metaTable.addAction(Actions.fadeIn(0.45f));
 
 		metaStage.addActor(metaTable);
 		Gdx.input.setInputProcessor(metaStage);
@@ -152,6 +164,9 @@ public class GameScreen implements Screen, EcouteurDeSlot {
 
 		partie.deplacer(slot.getPosInt(), slot.getPosEmpl(),
 				slotSelectionne.getPosInt(), slotSelectionne.getPosEmpl());
+
+		slot.animerPose();
+		slotSelectionne.animerPose();
 
 		// Rien n'a changé sur le pentagramme si les deux cases sont sur l'étagère.
 		if (surLePentagramme(slot) || surLePentagramme(slotSelectionne)) {
