@@ -166,3 +166,5 @@ Thumbs.db
 ## Sauvegardes de parties, réécrites par le jeu à chaque déplacement d'ingrédient :
 saves/
 posision*.json
+
+.vscode/
