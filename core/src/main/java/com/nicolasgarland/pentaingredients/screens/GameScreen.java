@@ -203,7 +203,7 @@ public class GameScreen implements Screen {
 
         for (int row = 0; row < 10; row++) {
             for (int col = 0; col < 10; col++) {
-            	final InventorySlot slot = new InventorySlot(emptySlot, Emplacement.ETAGERE, row*10+col);
+            	final InventorySlot slot = new InventorySlot(emptySlot, Emplacement.ETAGERE, row*10+col, game.ingredientIcons);
                 
             	int idIng = thisPositions.etagere[row][col];
             	if(idIng != 0) slot.setItem(listOfIngredients.get(idIng-1));
@@ -317,7 +317,8 @@ public class GameScreen implements Screen {
 	private void updateInfoPanel() {
 	    if (selectedSlot != null && selectedSlot.getItem() != null) {
 	        Ingredient item = selectedSlot.getItem();
-	        infoIcon.setDrawable(new TextureRegionDrawable(item.getIcon()));
+	        Texture icone = game.ingredientIcons.get(item.id);
+	        if (icone != null) infoIcon.setDrawable(new TextureRegionDrawable(icone));
 	    	infoName.setText(item.name);
 	    	infoFamily.setText(item.famille.toString());
 	    	infoCout.setText("Coût : "+item.cout);
@@ -440,7 +441,7 @@ public class GameScreen implements Screen {
 	            { 0.57f, -0.80f}   // Position du slot 5
 	        };
 	    for(int i=0; i<5; i++) {
-	    	final InventorySlot slotP = new InventorySlot(slotTexture, Emplacement.PUISSANCE, i);
+	    	final InventorySlot slotP = new InventorySlot(slotTexture, Emplacement.PUISSANCE, i, game.ingredientIcons);
 	    	int idIng = thisPositions.pentaPuissance[i];
 	    	if(idIng != 0) slotP.setItem(listOfIngredients.get(idIng-1));
 	    	slotP.setPosition(	PENTAILLE/2*(1+slotPositionsPuissance[i][0])-slotP.getWidth()/2, 
@@ -463,7 +464,7 @@ public class GameScreen implements Screen {
 	            {-0.35f, -0.125f}   // Position du slot 5
 	        };
 	    for(int i=0; i<5; i++) {
-	    	InventorySlot slotC = new InventorySlot(slotTexture, Emplacement.CONTROLE, i);
+	    	InventorySlot slotC = new InventorySlot(slotTexture, Emplacement.CONTROLE, i, game.ingredientIcons);
 	    	int idIng = thisPositions.pentaControle[i];
 	    	if(idIng != 0) slotC.setItem(listOfIngredients.get(idIng-1));
 	    	slotC.setPosition(	PENTAILLE/2*(1+slotPositionsControle[i][0])-slotC.getWidth()/2, 

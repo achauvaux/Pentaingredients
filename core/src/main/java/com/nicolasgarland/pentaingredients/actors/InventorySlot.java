@@ -4,6 +4,8 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.graphics.Texture;
+import com.nicolasgarland.pentaingredients.graphics.IngredientIcons;
 import com.nicolasgarland.pentaingredients.utils.Ingredient;
 import com.nicolasgarland.pentaingredients.utils.Positions;
 import com.nicolasgarland.pentaingredients.utils.Positions.Emplacement;
@@ -15,18 +17,11 @@ public class InventorySlot extends Actor {
     private boolean isSelected;               // Case sélectionnée ?
     private Positions.Emplacement posEmpl;
     private int posInt;
-    
-    public InventorySlot() {
-        this.slotTexture = null;
-        this.item = null;
-        this.setSelected(false);
-        setSize(SLOT_SIZE, SLOT_SIZE);
-        this.setPosEmpl(Emplacement.ETAGERE);
-        this.setPosInt(0);
-    }
+    private final IngredientIcons icones;
 
-    public InventorySlot(TextureRegion slotTexture, Emplacement empl, int num) {
+    public InventorySlot(TextureRegion slotTexture, Emplacement empl, int num, IngredientIcons icones) {
         this.slotTexture = slotTexture;
+        this.icones = icones;
         this.item = null;
         this.setSelected(false);
         setSize(SLOT_SIZE, SLOT_SIZE);
@@ -48,7 +43,10 @@ public class InventorySlot extends Actor {
 
         // Dessiner l'objet s'il y en a un
         if (item != null) {
-            batch.draw(item.getIcon(), getX() + 5, getY() + 5, getWidth() - 10, getHeight() - 10);
+            Texture icone = icones.get(item.id);
+            if (icone != null) {
+                batch.draw(icone, getX() + 5, getY() + 5, getWidth() - 10, getHeight() - 10);
+            }
         }
     }
 
