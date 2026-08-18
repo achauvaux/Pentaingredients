@@ -247,4 +247,75 @@ class ArbitreTest {
 		assertEquals(0, resultat.puissance[FOUDRE], "la Foudre non plus");
 		assertTrue(resultat.description.contains("sous contrôle"), "aucun contrôle n'a été posé");
 	}
+
+	// ------------------------------------------------ topologie des cinq lignes
+
+	/**
+	 * Vérifie qu'une ligne relie bien les deux emplacements de puissance
+	 * attendus : on ne remplit qu'eux, toutes les autres lignes restant
+	 * incomplètes et donc muettes.
+	 */
+	private void verifiePointesDeLaLigne(int ligne, int emplacementA, int emplacementB) {
+		int[] puissance = new int[5];
+		puissance[emplacementA] = DRAGON;
+		puissance[emplacementB] = SALAMANDRE;
+
+		Arbitre arbitre = arbitre(niveau(RIEN, new int[] {0, 0, 0}), puissance, new int[] {0, 0, 0, 0, 0});
+
+		assertArrayEquals(energies(3, 0, 0, 0, 0, 0), arbitre.lignePuissanceBrut(ligne),
+				"la ligne " + ligne + " doit relier les pointes " + emplacementA + " et " + emplacementB);
+	}
+
+	/** Même vérification pour les deux emplacements de contrôle portés par la ligne. */
+	private void verifieMilieuxDeLaLigne(int ligne, int emplacementA, int emplacementB) {
+		int[] controle = new int[5];
+		controle[emplacementA] = DRAGON;
+		controle[emplacementB] = SALAMANDRE;
+
+		Arbitre arbitre = arbitre(niveau(RIEN, new int[] {0, 0, 0}), new int[] {0, 0, 0, 0, 0}, controle);
+
+		assertArrayEquals(energies(3, 0, 0, 0, 0, 0), arbitre.ligneControleBrut(ligne),
+				"la ligne " + ligne + " doit porter les milieux " + emplacementA + " et " + emplacementB);
+	}
+
+	/** La synergie possède sa propre lecture de la topologie : elle doit concorder. */
+	private void verifieSynergieDeLaLigne(int ligne, int pointeA, int pointeB, int milieuA, int milieuB) {
+		int[] puissance = new int[5];
+		puissance[pointeA] = DRAGON;        // MAGIQUE
+		puissance[pointeB] = SALAMANDRE;    // ANIMALE
+		int[] controle = new int[5];
+		controle[milieuA] = PONCE;          // MINERALE
+		controle[milieuB] = PERSIL;         // VEGETALE
+
+		Arbitre arbitre = arbitre(niveau(RIEN, new int[] {0, 0, 0}), puissance, controle);
+
+		assertEquals(2, arbitre.multLigneSynergie(ligne),
+				"la ligne " + ligne + " voit quatre familles différentes, elle doit doubler");
+	}
+
+	@Test
+	@DisplayName("Chaque ligne relie les emplacements attendus")
+	void topologieDesCinqLignes() {
+		verifiePointesDeLaLigne(1, 0, 1);
+		verifiePointesDeLaLigne(2, 1, 2);
+		verifiePointesDeLaLigne(3, 2, 3);
+		verifiePointesDeLaLigne(4, 3, 4);
+		verifiePointesDeLaLigne(5, 4, 0);
+
+		verifieMilieuxDeLaLigne(1, 0, 1);
+		verifieMilieuxDeLaLigne(2, 2, 3);
+		verifieMilieuxDeLaLigne(3, 4, 0);
+		verifieMilieuxDeLaLigne(4, 1, 2);
+		verifieMilieuxDeLaLigne(5, 3, 4);
+	}
+
+	@Test
+	@DisplayName("La synergie lit la même topologie que le calcul des énergies")
+	void topologieVueParLaSynergie() {
+		verifieSynergieDeLaLigne(1, 0, 1, 0, 1);
+		verifieSynergieDeLaLigne(2, 1, 2, 2, 3);
+		verifieSynergieDeLaLigne(3, 2, 3, 4, 0);
+		verifieSynergieDeLaLigne(4, 3, 4, 1, 2);
+		verifieSynergieDeLaLigne(5, 4, 0, 3, 4);
+	}
 }
