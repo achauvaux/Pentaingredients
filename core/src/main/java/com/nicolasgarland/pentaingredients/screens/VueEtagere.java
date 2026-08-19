@@ -18,6 +18,7 @@ import com.nicolasgarland.pentaingredients.graphics.Palette;
 import com.nicolasgarland.pentaingredients.graphics.RessourcesJeu;
 import com.nicolasgarland.pentaingredients.utils.Ingredient;
 import com.nicolasgarland.pentaingredients.utils.Partie;
+import com.nicolasgarland.pentaingredients.utils.Positions;
 import com.nicolasgarland.pentaingredients.utils.Positions.Emplacement;
 
 /**
@@ -25,9 +26,6 @@ import com.nicolasgarland.pentaingredients.utils.Positions.Emplacement;
  * fiche de l'ingrédient sélectionné, et le bouton de remise à zéro.
  */
 public class VueEtagere {
-
-	private static final int RANGEES = 10;
-	private static final int CASES_PAR_RANGEE = 10;
 
 	private final Partie partie;
 	private final Skin skin;
@@ -80,9 +78,9 @@ public class VueEtagere {
 	private Table rangees() {
 		Table grille = new Table();
 
-		for (int rangee = 0; rangee < RANGEES; rangee++) {
-			for (int colonne = 0; colonne < CASES_PAR_RANGEE; colonne++) {
-				int position = rangee * CASES_PAR_RANGEE + colonne;
+		for (int rangee = 0; rangee < Positions.RANGEES_ETAGERE; rangee++) {
+			for (int colonne = 0; colonne < Positions.CASES_PAR_RANGEE; colonne++) {
+				int position = rangee * Positions.CASES_PAR_RANGEE + colonne;
 				final InventorySlot slot =
 						new InventorySlot(ressources.caseVide, Emplacement.ETAGERE, position, icones);
 				slot.setColor(Palette.CASE_PLEINE);

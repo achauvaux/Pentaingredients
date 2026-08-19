@@ -221,6 +221,9 @@ public class GameScreen implements Screen, EcouteurDeSlot {
 		};
 
 		Pentacle resultat = partie.valider();
+		if (resultat.estReussi()) {
+			game.progression.enregistrer(partie.numeroNiveau, resultat.etoiles, resultat.cout);
+		}
 
 		Table contenu = new Table();
 		contenu.add(new Label(" Puissance requise : ", skin, "default")).align(Align.left);

@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.nicolasgarland.pentaingredients.graphics.IngredientIcons;
+import com.nicolasgarland.pentaingredients.utils.Progression;
 import com.nicolasgarland.pentaingredients.screens.MainMenuScreen;
 
 public class Main extends Game {
@@ -17,10 +18,14 @@ public class Main extends Game {
 	/** Icônes des ingrédients, chargées une fois et partagées par tous les écrans. */
 	public IngredientIcons ingredientIcons;
 
+	/** Ce que le joueur a déjà réussi, partagé par tous les écrans. */
+	public Progression progression;
+
     @Override
     public void create() {
         batch = new SpriteBatch();
         ingredientIcons = new IngredientIcons();
+        progression = Progression.charger();
         // use libGDX's default font
      	font = new BitmapFont();
      	viewport = new FitViewport(8, 5);

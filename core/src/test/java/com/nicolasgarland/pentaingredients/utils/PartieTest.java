@@ -1,6 +1,7 @@
 package com.nicolasgarland.pentaingredients.utils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -40,7 +41,11 @@ class PartieTest {
 	}
 
 	private static Partie partieVide() {
-		return partie(new int[5], new int[5], new int[10][10]);
+		return partie(new int[5], new int[5], etagereVide());
+	}
+
+	private static int[][] etagereVide() {
+		return new int[Positions.RANGEES_ETAGERE][Positions.CASES_PAR_RANGEE];
 	}
 
 	@Test
@@ -54,19 +59,41 @@ class PartieTest {
 	}
 
 	@Test
-	@DisplayName("Une case d'étagère se désigne par rangée × 10 + colonne")
+	@DisplayName("Une case d'étagère se désigne par rangée × largeur + colonne")
 	void adressageDeLEtagere() {
-		int[][] etagere = new int[10][10];
+		int largeur = Positions.CASES_PAR_RANGEE;
+		int derniereRangee = Positions.RANGEES_ETAGERE - 1;
+
+		int[][] etagere = etagereVide();
 		etagere[0][0] = PERSIL;
-		etagere[3][7] = AIL;
-		etagere[9][9] = PONCE;
+		etagere[3][largeur - 1] = AIL;
+		etagere[derniereRangee][largeur - 1] = PONCE;
 
 		Partie partie = partie(new int[5], new int[5], etagere);
 
 		assertEquals(PERSIL, partie.idSur(0, Emplacement.ETAGERE));
-		assertEquals(AIL, partie.idSur(3 * 10 + 7, Emplacement.ETAGERE));
-		assertEquals(PONCE, partie.idSur(9 * 10 + 9, Emplacement.ETAGERE));
-		assertEquals(0, partie.idSur(42, Emplacement.ETAGERE), "case restée vide");
+		assertEquals(AIL, partie.idSur(3 * largeur + largeur - 1, Emplacement.ETAGERE));
+		assertEquals(PONCE, partie.idSur(derniereRangee * largeur + largeur - 1, Emplacement.ETAGERE),
+				"la toute dernière case");
+		assertEquals(0, partie.idSur(2 * largeur + 4, Emplacement.ETAGERE), "case restée vide");
+	}
+
+	@Test
+	@DisplayName("L'étagère offre exactement une case par ingrédient du jeu")
+	void etagereAjusteeAuCatalogue() {
+		assertEquals(48, Positions.RANGEES_ETAGERE * Positions.CASES_PAR_RANGEE,
+				"48 ingrédients, donc 48 cases : aucune n'a besoin de rester libre");
+
+		Positions neuves = new Positions();
+		boolean[] vus = new boolean[49];
+		for (int position = 0; position < 48; position++) {
+			int id = neuves.getIngr(position, Emplacement.ETAGERE);
+			assertFalse(vus[id], "l'ingrédient " + id + " apparaît deux fois");
+			vus[id] = true;
+		}
+		for (int id = 1; id <= 48; id++) {
+			assertTrue(vus[id], "l'ingrédient " + id + " manque à l'étagère");
+		}
 	}
 
 	@Test
@@ -75,7 +102,7 @@ class PartieTest {
 		Partie partie = partie(
 				new int[] {0, PONCE, 0, 0, 0},
 				new int[] {AIL, 0, 0, 0, 0},
-				new int[10][10]);
+				etagereVide());
 
 		assertEquals(PONCE, partie.idSur(1, Emplacement.PUISSANCE));
 		assertEquals(0, partie.idSur(0, Emplacement.PUISSANCE));
@@ -88,7 +115,7 @@ class PartieTest {
 	void calculsDelegues() {
 		// Ponce et Persil aux deux pointes de la ligne 1 : 1 Feu en commun.
 		Partie partie = partie(
-				new int[] {PONCE, PERSIL, 0, 0, 0}, new int[5], new int[10][10]);
+				new int[] {PONCE, PERSIL, 0, 0, 0}, new int[5], etagereVide());
 
 		assertEquals(300, partie.coutTotal(), "200 + 100, l'étagère ne compte pas");
 		assertEquals(1, partie.synergie(1), "deux familles sur quatre emplacements, dont deux vides");

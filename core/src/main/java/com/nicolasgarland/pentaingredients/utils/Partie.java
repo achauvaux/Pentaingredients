@@ -56,7 +56,7 @@ public class Partie {
 			Gdx.app.log("ERROR", "in loading ingredients list : " + Gdx.files.internal(chemin).file().getAbsolutePath());
 		}
 
-		return new Partie(numeroNiveau, niveau, ingredients, new Positions().loadPositions(numeroNiveau));
+		return new Partie(numeroNiveau, niveau, ingredients, Positions.charger(numeroNiveau));
 	}
 
 	/** Existe-t-il un niveau portant ce numéro ? */

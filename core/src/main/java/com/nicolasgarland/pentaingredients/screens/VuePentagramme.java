@@ -33,7 +33,19 @@ import com.nicolasgarland.pentaingredients.utils.Positions.Emplacement;
  */
 public class VuePentagramme {
 
-	private static final int COTE = 650;
+	private static final int COTE = 690;
+
+	/**
+	 * Longueur et épaisseur d'un trait, en fractions du côté. Ces rapports
+	 * viennent du réglage d'origine, fait à 650 pixels : les exprimer ainsi
+	 * plutôt qu'en valeurs absolues garde la figure juste à n'importe quelle
+	 * taille.
+	 */
+	private static final float LONGUEUR_TRAIT = 600f / 650f;
+	private static final float EPAISSEUR_TRAIT = 128f / 650f;
+
+	/** Taille d'une étoile d'objectif. Sa texture fait 173 px, bien trop pour ici. */
+	private static final int TAILLE_ETOILE = 104;
 
 	/** Inclinaison de chaque trait, en degrés. */
 	private static final int[] ANGLE_DES_TRAITS = {0, 37, 72, 108, 144};
@@ -148,7 +160,7 @@ public class VuePentagramme {
 			// Éteintes : ce sont des seuils à atteindre, pas des récompenses acquises.
 			Image etoile = new Image(ressources.etoile);
 			etoile.setColor(Palette.ETOILE_ETEINTE);
-			commande.add(etoile).center();
+			commande.add(etoile).size(TAILLE_ETOILE).center();
 		}
 		commande.row();
 
@@ -184,8 +196,8 @@ public class VuePentagramme {
 			Image trait = traits[ligne];
 			synergieAffichee[ligne] = partie.synergie(ligne + 1);
 			trait.setColor(couleurSelonSynergie(synergieAffichee[ligne]));
-			trait.setWidth(COTE - 50);
-			trait.setHeight(128);
+			trait.setWidth(COTE * LONGUEUR_TRAIT);
+			trait.setHeight(COTE * EPAISSEUR_TRAIT);
 			trait.setRotation(ANGLE_DES_TRAITS[ligne]);
 			trait.setPosition(place(CENTRE_DES_TRAITS[ligne][0], trait.getWidth()),
 					place(CENTRE_DES_TRAITS[ligne][1], trait.getHeight()));
